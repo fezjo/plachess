@@ -1,0 +1,31 @@
+X piece movement
+X capturing
+
+castling:
+    X king and the rook must not be moved
+    X the king must not be in check
+    X no square between king's start and final square may be controlled by the enemy
+
+    X castling does not reset half move clock
+
+pawns:
+    X first move can be double-jump
+    X capture different than move
+    X en passant
+    X promotion
+
+check:
+    X must prevent checkmate
+    X no check by king
+
+draw:
+    X not in check and no legal move
+    X dead positions (k vs k, k vs k&bishop, k vs k&knight, k&bishop vs k&bishop on same color)
+    *fivefold repetition rule
+    X seventy-five-move rule
+    need to ask:
+        *threefold repetition rule
+        X fifty-move rule
+
+will not implement three and five fold repetition move as it is unlikely to happen
+and we do not have information about previous board positions
