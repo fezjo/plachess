@@ -2,6 +2,7 @@ package plachess.engine;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public interface Move {
     /**
@@ -14,10 +15,10 @@ public interface Move {
     /** set false to specified positions in castling (if side is null, set both sides) */
     static void loseCastling(boolean[] castling, Color color, PieceType side) {
         if(side != null)
-            castling[ArrayBoardPosition.castlingArrayIndex(color, side)] = false;
+            castling[BoardPosition.castlingArrayIndex(color, side)] = false;
         else {
-            castling[ArrayBoardPosition.castlingArrayIndex(color, PieceType.KING)] =
-            castling[ArrayBoardPosition.castlingArrayIndex(color, PieceType.QUEEN)] = false;
+            castling[BoardPosition.castlingArrayIndex(color, PieceType.KING)] =
+            castling[BoardPosition.castlingArrayIndex(color, PieceType.QUEEN)] = false;
         }
     }
 
@@ -99,6 +100,29 @@ public interface Move {
                     newHalfMoveClock, newFullMoveClock
             );
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(posFrom, posTo);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(this == obj) return true;
+            if(obj == null || obj.getClass() != getClass()) return false;
+            MoveSimple that = (MoveSimple) obj;
+            return this.posFrom.equals(that.posFrom) && this.posTo.equals(that.posTo);
+        }
+
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("MoveSimple(%s->%s)", posFrom, posTo);
+        }
     }
 
     class MoveCastling implements Move {
@@ -142,6 +166,29 @@ public interface Move {
                     newCastling, null,
                     newHalfMoveClock, newFullMoveClock
             );
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(color, side);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(this == obj) return true;
+            if(obj == null || obj.getClass() != getClass()) return false;
+            MoveCastling that = (MoveCastling) obj;
+            return this.color == that.color && this.side == that.side;
+        }
+
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("MoveCastling(%s, %s)", color, side);
         }
     }
 
@@ -192,6 +239,30 @@ public interface Move {
                     newHalfMoveClock, newFullMoveClock
             );
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(posFrom, posTo, promotion);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(this == obj) return true;
+            if(obj == null || obj.getClass() != getClass()) return false;
+            MovePawnPromotion that = (MovePawnPromotion) obj;
+            return this.posFrom.equals(that.posFrom) && this.posTo.equals(that.posTo) &&
+                    this.promotion == that.promotion;
+        }
+
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("MovePawnPromotion(%s->%s ^%s)", posFrom, posTo, promotion);
+        }
     }
 
     class MoveEnpassant implements Move {
@@ -241,6 +312,29 @@ public interface Move {
                     bp.getCastling(), null,
                     newHalfMoveClock, newFullMoveClock
             );
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(posFrom, posTo);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(this == obj) return true;
+            if(obj == null || obj.getClass() != getClass()) return false;
+            MoveEnpassant that = (MoveEnpassant) obj;
+            return this.posFrom.equals(that.posFrom) && this.posTo.equals(that.posTo);
+        }
+
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("MoveEnpassant(%s->%s)", posFrom, posTo);
         }
     }
 }

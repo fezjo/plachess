@@ -3,7 +3,7 @@ package plachess.engine;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class ArrayBoardPosition {
+public class ArrayBoardPosition implements BoardPosition {
     private final Board board;
     private final Color turnColor;
     private final boolean[] castling;
@@ -47,36 +47,47 @@ public class ArrayBoardPosition {
         return move.apply(this);
     }
 
-    /** @return reference to board */
+    @Override
     public Board getBoard() { return board; }
 
+    @Override
     public Color getTurnColor() { return turnColor; }
 
-    /** @return copy of castling array (WK, WQ, BK, BQ) */
+    @Override
     public boolean[] getCastling() { return castling.clone(); }
 
+    @Override
     public Position getEnpassant() { return enpassant; }
 
+    @Override
     public int getHalfMoveClock() { return halfMoveClock; }
 
+    @Override
     public int getFullMoveClock() { return fullMoveClock; }
+
+    @Override
+    public Piece getPiece(Position pos) {
+        return board.getPiece(pos);
+    }
+
+    @Override
+    public PieceType getPieceType(Position pos) {
+        return board.getPiece(pos).type;
+    }
+
+    @Override
+    public Color getPieceColor(Position pos) {
+        return board.getPiece(pos).color;
+    }
 
     /** @return list of positions which check king of provided color */
     public List<Position> getChecking(Color color) {
         return Collections.unmodifiableList(checking.get(color));
     }
 
+    @Override
     public boolean canCastle(Color color, PieceType side) {
-        return castling[castlingArrayIndex(color, side)];
-    }
-
-    /**
-     * @param side KING or QUEEN side
-     * @return index to castling array corresponding to information provided
-     */
-    public static int castlingArrayIndex(Color color, PieceType side) {
-        if(!Rules.isValidCastlingSide(side)) throw new IllegalArgumentException("Invalid castling side");
-        return (color == Color.WHITE ? 0 : 2) + (side == PieceType.KING ? 0 : 1);
+        return castling[BoardPosition.castlingArrayIndex(color, side)];
     }
 
     /** board has to be oriented white side down */
@@ -96,14 +107,9 @@ public class ArrayBoardPosition {
         return result;
     }
 
-    /**
-     * generates all simple moves, adds specials moves (castling, enpassant), filters out invalid moves
-     * handles promotion and moves not preventing checkmate
-     * returned BoardPositions can be in check or draw (make sure by calling isDraw)
-     * @return all BoardPositions created by a valid move from this BoardPosition
-     */
-    public ArrayList<ArrayBoardPosition> getMoves() {
-        ArrayList<Move> moves = new ArrayList<Move>(board.getAllSimpleMoves(getTurnColor()));
+    @Override
+    public ArrayList<BoardPosition> getMoves() {
+        ArrayList<Move> moves = new ArrayList<>(board.getAllSimpleMoves(getTurnColor()));
         for(int i=0; i<moves.size(); ++i) {
             if(!(moves.get(i) instanceof Move.MoveSimple))  // TODO validte that this works as expected
                 continue;
@@ -127,7 +133,7 @@ public class ArrayBoardPosition {
 
         moves.addAll(getCastlingMoves());
 
-        ArrayList<ArrayBoardPosition> result = new ArrayList<>();
+        ArrayList<BoardPosition> result = new ArrayList<>();
         for(Move move: moves) {
             ArrayBoardPosition newBP = move.apply(this);
             if(!newBP.isKingValid() || newBP.isCheck(turnColor))
@@ -138,19 +144,13 @@ public class ArrayBoardPosition {
         return result;
     }
 
-    /**
-     * either side has exactly one, kings do not threaten each other
-     * @return whether rules about kings are met
-     */
+    @Override
     public boolean isKingValid() {
         return Stream.of(Color.values()).allMatch(c -> pieces.get(PieceType.KING).get(c).size() == 1) &&
                 checking.get(turnColor).stream().noneMatch(p -> board.getPiece(p).type == PieceType.KING);
     }
 
-    /**
-     * K vs K, K vs K&knight, K vs K&bishop, K&bishop vs K&bishop on same color)
-     * @return whether the position is declared dead and therefore draw
-     */
+    @Override
     public boolean isDeadPosition() {
         for(PieceType t: Arrays.asList(PieceType.PAWN, PieceType.ROOK, PieceType.QUEEN))
             for(Color c: Color.values())
@@ -173,46 +173,17 @@ public class ArrayBoardPosition {
         return (pB.x + pB.y) % 2 == (pW.x + pW.y) % 2;
     }
 
-    /**
-     * will check fifty-move rule
-     * will not check for threefold repetition rule
-     * @return whether the current position can be called draw by some color
-     */
+    @Override
     public boolean canCallDraw() {
         return getHalfMoveClock() >= Rules.DRAW_HALFMOVES_CLAIM;
     }
 
-    /**
-     * will check for not being in check and not having legal move, dead positions, seventy-five-move rule
-     * will not check for fivefold repetition rule
-     * @return whether the current position is draw
-     */
-    public static boolean isDraw(ArrayBoardPosition curr, List<ArrayBoardPosition> next, Color color) {
-        return curr.getHalfMoveClock() > Rules.DRAW_HALFMOVES_NOCLAIM ||
-                curr.isDeadPosition() ||
-                (curr.getHalfMoveClock() == Rules.DRAW_HALFMOVES_NOCLAIM && !isCheckMate(curr, next, color)) ||
-                (!curr.isCheck(color) && allMovesCheck(next, color));
-    }
-
-    /** @return whether the color is in check */
+    @Override
     public boolean isCheck(Color color) {
         return !checking.get(color).isEmpty();
     }
 
-    /**
-     * @param curr current position of board
-     * @param next all valid moves from curr
-     * @return whether the color has been checkmated
-     */
-    public static boolean isCheckMate(ArrayBoardPosition curr, List<ArrayBoardPosition> next, Color color) {
-        return curr.isCheck(color) && allMovesCheck(next, color);
-    }
-
-    /**
-     * @param next list of moves
-     * @return whether exists move in which color will not be in check
-     */
-    public static boolean allMovesCheck(List<ArrayBoardPosition> next, Color color) {
-        return next.stream().allMatch(x -> x.isCheck(color));
+    public boolean test() {
+        return true;
     }
 }

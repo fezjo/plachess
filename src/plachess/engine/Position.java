@@ -1,7 +1,9 @@
 package plachess.engine;
 
+import java.util.Objects;
+
 /**
- * Position is immutable
+ * @Immutable
  */
 public class Position {
     public final int x, y;
@@ -14,8 +16,8 @@ public class Position {
     public Position add(int x, int y) { return new Position(this.x+x, this.y+y); }
 
     @Override
-    public String toString() {
-        return String.format("(%d, %d)", x, y);
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 
     @Override
@@ -27,4 +29,9 @@ public class Position {
     }
 
     public boolean equals(int x, int y) { return this.x == x && this.y == y; }
+
+    @Override
+    public String toString() {
+        return String.format("(%d, %d)", x, y);
+    }
 }

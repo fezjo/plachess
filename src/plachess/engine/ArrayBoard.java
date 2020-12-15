@@ -1,9 +1,10 @@
 package plachess.engine;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArrayBoard implements Board {
-    private static ArrayBoardImplementation implementation = new ArrayBoardImplementation();
+    private final static ArrayBoardImplementation implementation = new ArrayBoardImplementation();
     private Piece[][] grid;
 
     public ArrayBoard() {
@@ -14,6 +15,12 @@ public class ArrayBoard implements Board {
         this();
         for(int y=0; y<grid.length; ++y)
             grid[y] = board.grid[y].clone();
+    }
+
+    public ArrayBoard(Piece[][] board) {
+        this();
+        for(int y=0; y<grid.length; ++y)
+            grid[y] = board[y].clone();
     }
 
     @Override
@@ -85,5 +92,18 @@ public class ArrayBoard implements Board {
             result.grid[pos.y][pos.x] = p.scnd.setPos(pos);
         }
         return result;
+    }
+
+    public static boolean test() {
+        String xfen = "rnbqkbnr/ppp1pppp/3p4/8/8/8/PPPPPPPP/RNBQKBNR";
+        ArrayBoard board = (ArrayBoard)Board.fromXFEN(new ArrayBoard(), xfen);
+        System.out.println(board.getPiece(0, 0));
+        System.out.println(xfen);
+        System.out.println(board.toXFEN());
+        System.out.println(board.toStringGrid());
+        System.out.println(board.getAllPieces());
+        System.out.println(board.getAllSimpleMoves(Color.WHITE));
+        System.out.println(board.getAllSimpleMoves(Color.BLACK));
+        return true;
     }
 }

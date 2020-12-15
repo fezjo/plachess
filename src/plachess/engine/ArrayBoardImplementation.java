@@ -99,18 +99,18 @@ public class ArrayBoardImplementation {
 
         Position next = piece.pos.add(direction);
         if(retTravel) {
-            if (!board.isOccupied(next))
+            if (next.isValid() && !board.isOccupied(next))
                 result.add(next);
             if (!hasMoved) {
                 next = next.add(direction);
-                if (!board.isOccupied(next))
+                if (next.isValid() && !board.isOccupied(next))
                     result.add(next);
             }
         }
         if(retCapture) {
             for (int x = -1; x < 2; x += 2) {
                 next = piece.pos.add(new Position(x, direction.y));
-                if (board.isOccupied(next) && board.getPiece(next).color != piece.color)
+                if (next.isValid() && board.isOccupied(next) && board.getPiece(next).color != piece.color)
                     result.add(next);
             }
         }

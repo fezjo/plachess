@@ -1,5 +1,10 @@
 package plachess.engine;
 
+import java.util.Objects;
+
+/**
+ * @Immutable
+ */
 public class Piece {
     public final Color color;
     public final Position pos;
@@ -20,6 +25,24 @@ public class Piece {
 
     public Piece setPos(Position pos) { return new Piece(pos, this.color, this.type); }
     public Piece setPosition(int x, int y) { return new Piece(x, y, this.color, this.type); }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pos, color, type);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) return true;
+        if(obj == null || obj.getClass() != getClass()) return false;
+        Piece that = (Piece)obj;
+        return this.color == that.color && this.type == that.type && this.pos.equals(that.pos);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return this;
+    }
 
     @Override
     public String toString() {

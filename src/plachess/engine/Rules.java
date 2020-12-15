@@ -1,6 +1,10 @@
 package plachess.engine;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public interface Rules {
     int BOARD_SIZE = 8;
@@ -20,7 +24,7 @@ public interface Rules {
     static int getColorDirection(Color color) { return color == Color.WHITE ? DIR_WHITE : DIR_BLACK; }
 
     static boolean isPawnMoved(Position pos, Color color) {
-        return pos.y == getColorHomeRow(color) + getColorDirection(color);
+        return pos.y != getColorHomeRow(color) + getColorDirection(color);
     }
 
     static boolean isPromotion(Piece piece, Position posTo) {
@@ -45,4 +49,27 @@ public interface Rules {
         }
         return result;
     }
+
+
+    Map<Pair<Color, PieceType>, Character> piece2char = new HashMap<>(Stream.of(
+            new Pair<>(new Pair<>(Color.WHITE, PieceType.PAWN), 'P'),
+            new Pair<>(new Pair<>(Color.WHITE, PieceType.KNIGHT), 'N'),
+            new Pair<>(new Pair<>(Color.WHITE, PieceType.BISHOP), 'B'),
+            new Pair<>(new Pair<>(Color.WHITE, PieceType.ROOK), 'R'),
+            new Pair<>(new Pair<>(Color.WHITE, PieceType.QUEEN), 'Q'),
+            new Pair<>(new Pair<>(Color.WHITE, PieceType.KING), 'K'),
+            new Pair<>(new Pair<>(Color.BLACK, PieceType.PAWN), 'p'),
+            new Pair<>(new Pair<>(Color.BLACK, PieceType.KNIGHT), 'n'),
+            new Pair<>(new Pair<>(Color.BLACK, PieceType.BISHOP), 'b'),
+            new Pair<>(new Pair<>(Color.BLACK, PieceType.ROOK), 'r'),
+            new Pair<>(new Pair<>(Color.BLACK, PieceType.QUEEN), 'q'),
+            new Pair<>(new Pair<>(Color.BLACK, PieceType.KING), 'k')).collect(
+            Collectors.toMap(p -> p.frst, p -> p.scnd)));
+
+    Map<Character, Piece> char2piece = new HashMap<>(piece2char.
+            entrySet().stream().collect(
+            Collectors.toMap(
+                    Map.Entry::getValue,
+                    e -> new Piece(null, e.getKey().frst,  e.getKey().scnd)
+            )));
 }

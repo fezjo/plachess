@@ -1,6 +1,8 @@
 package plachess.engine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -9,6 +11,7 @@ import java.util.List;
  */
 public interface Board {
     Board clone();
+
     boolean isOccupied(Position pos);
     default boolean isOccupied(int x, int y) { return isOccupied(new Position(x, y)); }
 
@@ -31,4 +34,64 @@ public interface Board {
     ArrayList<Position> getThreatening(Piece piece);
 
     Board set(List<Pair<Position, Piece>> work);
+
+
+    static<B extends Board> Board fromXFEN(B emptyBoard, String xfen) {
+        String fen_board = xfen.split(" ")[0];
+        String[] rows = fen_board.split("/");
+        Collections.reverse(Arrays.asList(rows));
+        ArrayList<Pair<Position, Piece>> instructions = new ArrayList<>();
+        for(int y=0; y<Rules.BOARD_SIZE; ++y) {
+            int x=0;
+            for(char c: rows[y].toCharArray()) {
+                if(!Rules.char2piece.containsKey(c))
+                    x += c - '0';
+                else {
+                    instructions.add(new Pair<>(new Position(x, y), Rules.char2piece.get(c)));
+                    ++x;
+                }
+            }
+        }
+        return emptyBoard.set(instructions);
+    }
+
+    /** @return the first part of XFEN */
+    default String toXFEN() {
+        StringBuilder sb = new StringBuilder();
+        for(int y=Rules.BOARD_SIZE-1; y>=0; --y) {
+            int empty=0;
+            for(int x=0; x<Rules.BOARD_SIZE; ++x) {
+                Piece p = this.getPiece(x, y);
+                if(Piece.isEmpty(p))
+                    empty++;
+                else {
+                    if(empty > 0) {
+                        sb.append(empty);
+                        empty = 0;
+                    }
+                    sb.append(Rules.piece2char.get(new Pair<>(p.color, p.type)));
+                }
+            }
+            if(empty > 0) sb.append(empty);
+            sb.append('/');
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
+    }
+
+    default String toStringGrid() {
+        StringBuilder sb = new StringBuilder();
+        for(int y=Rules.BOARD_SIZE-1; y>=0; --y) {
+            for(int x=0; x<Rules.BOARD_SIZE; ++x) {
+                Piece p = this.getPiece(x, y);
+                if(Piece.isEmpty(p))
+                    sb.append('.');
+                else
+                    sb.append(Rules.piece2char.get(new Pair<>(p.color, p.type)));
+            }
+            sb.append('\n');
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
+    }
 }
