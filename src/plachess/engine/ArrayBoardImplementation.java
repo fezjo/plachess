@@ -17,7 +17,6 @@ public class ArrayBoardImplementation {
                 new Position(-1, +2),
                 new Position(+1, -2),
                 new Position(+1, +2),
-                new Position(-1, +1),
                 new Position(+2, -1),
                 new Position(+2, +1)
         ));
@@ -65,6 +64,8 @@ public class ArrayBoardImplementation {
      * @return all reachable positions on board with regard to other pieces
      */
     public ArrayList<Position> getMoves(Piece piece, Board board, int mask) {
+        if (piece.type == PieceType.EMPTY)
+            return new ArrayList<Position>();
         if(piece.type == PieceType.PAWN)
             return getMovesPawn(piece, board, mask);
         List<Position> move_directions = MOVE_DIRECTIONS.get(piece.type);

@@ -24,7 +24,7 @@ public class Piece {
     }
 
     public Piece setPos(Position pos) { return new Piece(pos, this.color, this.type); }
-    public Piece setPosition(int x, int y) { return new Piece(x, y, this.color, this.type); }
+    public Piece setPos(int x, int y) { return new Piece(x, y, this.color, this.type); }
 
     @Override
     public int hashCode() {

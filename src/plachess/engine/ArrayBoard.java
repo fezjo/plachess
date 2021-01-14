@@ -2,6 +2,7 @@ package plachess.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArrayBoard implements Board {
     private final static ArrayBoardImplementation implementation = new ArrayBoardImplementation();
@@ -80,7 +81,9 @@ public class ArrayBoard implements Board {
         for(PieceType type: PieceType.values())
             result.addAll(implementation.getMoves(
                     new Piece(piece.pos, piece.color, type),
-                    this, 2));
+                    this, 2).stream().filter(
+                            pos -> getPiece(pos).type == type
+                    ).collect(Collectors.toList()));
         return result;
     }
 
@@ -89,7 +92,10 @@ public class ArrayBoard implements Board {
         ArrayBoard result = new ArrayBoard(this);
         for(Pair<Position, Piece> p: work) {
             Position pos = p.frst;
-            result.grid[pos.y][pos.x] = p.scnd.setPos(pos);
+            if (p.scnd == null)
+                result.grid[pos.y][pos.x] = null;
+            else
+                result.grid[pos.y][pos.x] = p.scnd.setPos(pos);
         }
         return result;
     }

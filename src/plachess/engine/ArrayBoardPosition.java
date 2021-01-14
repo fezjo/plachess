@@ -13,7 +13,7 @@ public class ArrayBoardPosition implements BoardPosition {
     private Map<PieceType, Map<Color, ArrayList<Piece>>> pieces;
     private Map<Color, ArrayList<Position>> checking;
 
-    ArrayBoardPosition(
+    public ArrayBoardPosition(
             Board board, Color turnColor,
             boolean[] castling, Position enpassant,
             int halfMoveClock, int fullMoveClock) {
@@ -38,6 +38,8 @@ public class ArrayBoardPosition implements BoardPosition {
             pieces.get(piece.type).get(piece.color).add(piece);
 
         checking = new HashMap<>();
+        for(Color color: Color.values())
+            checking.put(color, new ArrayList<Position>());
         if(isKingValid())   // we will not look for checking pieces if kings are not meeting chess rules
             for(Color color: Color.values())
                 checking.put(color, board.getThreatening(pieces.get(PieceType.KING).get(color).get(0)));
@@ -98,11 +100,11 @@ public class ArrayBoardPosition implements BoardPosition {
         Piece king = pieces.get(PieceType.KING).get(turnColor).get(0);
         if(canCastle(turnColor, PieceType.KING) &&
                 Stream.of(5, 6).noneMatch(x -> board.isOccupied(x, king.pos.y)) &&
-                Stream.of(5, 6).allMatch(x -> board.getThreatening(king.setPosition(x, king.pos.y)).isEmpty()))
+                Stream.of(5, 6).allMatch(x -> board.getThreatening(king.setPos(x, king.pos.y)).isEmpty()))
             result.add(new Move.MoveCastling(turnColor, PieceType.KING));
         if(canCastle(turnColor, PieceType.QUEEN) &&
                 Stream.of(1, 2, 3).noneMatch(x -> board.isOccupied(x, king.pos.y)) &&
-                Stream.of(2, 3).allMatch(x -> board.getThreatening(king.setPosition(x, king.pos.y)).isEmpty()))
+                Stream.of(2, 3).allMatch(x -> board.getThreatening(king.setPos(x, king.pos.y)).isEmpty()))
             result.add(new Move.MoveCastling(turnColor, PieceType.QUEEN));
         return result;
     }
