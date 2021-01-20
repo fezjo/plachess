@@ -15,12 +15,12 @@ public class SelfmateSolver implements Solver {
     private ArrayList<Integer> numsOfMoves;
     private Integer numOfSolutions;
 
-    /** @return the minimum number of moves or -1 if unsolvable.*/
+    /** @return the minimum full move clock or -1 if unsolvable.*/
      private static int recurse(BoardPosition state,int max_depth){
         if (state.getTurnColor() == Color.WHITE && state.isCheckMate()){
-            return state.getFullMoveClock() - 1;
+            return state.getFullMoveClock();
         }
-        if (max_depth == 0){
+        if (max_depth == 0 || state.isDraw() || state.canCallDraw()){
             return -1;
         }
         int best = -1;
@@ -63,7 +63,7 @@ public class SelfmateSolver implements Solver {
             int numOfMoves = recurse(nextState, 2*n-1);
             if (numOfMoves != -1){
                 solutions.add(nextState);
-                numsOfMoves.add(numOfMoves);
+                numsOfMoves.add(numOfMoves - state.getFullMoveClock());
                 numOfSolutions += 1;
             }
         }
