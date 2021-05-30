@@ -12,8 +12,9 @@ public class ArrayBoardPosition implements BoardPosition {
     private final Position enpassant;
     private final int halfMoveClock, fullMoveClock;
 
-    private Map<PieceType, Map<Color, ArrayList<Piece>>> pieces;
-    private Map<Color, ArrayList<Position>> checking;
+    private Map<Color, Piece> kings;
+    private Map<Color, Boolean> inCheck;
+    private Map<Color, Map<PieceType, Integer>> pieceCount;
     private ArrayList<BoardPosition> nextMoves;
 
     public ArrayBoardPosition(
@@ -31,22 +32,24 @@ public class ArrayBoardPosition implements BoardPosition {
     }
 
     private void initialize() {
-        pieces = new EnumMap<>(PieceType.class);
-        for(PieceType pt: PieceType.values()) {
-            pieces.put(pt, new EnumMap<>(Color.class));
-            for (Color c : Color.values())
-                pieces.get(pt).put(c, new ArrayList<>());
+        kings = new EnumMap<>(Color.class);
+        pieceCount = new EnumMap<>(Color.class);
+        for(Color c: Color.values()) {
+            pieceCount.put(c, new EnumMap<>(PieceType.class));
+            for (PieceType pt: PieceType.values())
+                pieceCount.get(c).put(pt, 0);
         }
 
-        for(Piece piece: board.getAllPieces())
-            pieces.get(piece.type).get(piece.color).add(piece);
+        for(Piece piece: board.getAllPieces()) {
+            pieceCount.get(piece.color).compute(piece.type, (key, val) -> val + 1);
+            if(piece.type == PieceType.KING)
+                kings.put(piece.color, piece);
+        }
 
-        checking = new EnumMap<>(Color.class);
-        for(Color color: Color.values())
-            checking.put(color, new ArrayList<Position>());
+        inCheck = new EnumMap<>(Color.class);
         if(isKingValid())   // we will not look for checking pieces if kings are not meeting chess rules
             for(Color color: Color.values())
-                checking.put(color, board.getThreatening(pieces.get(PieceType.KING).get(color).get(0)));
+                inCheck.put(color, board.isThreatened(kings.get(color)));
 
         nextMoves = null;
     }
@@ -88,11 +91,6 @@ public class ArrayBoardPosition implements BoardPosition {
         return board.getPiece(pos).color;
     }
 
-    /** @return list of positions which check king of provided color */
-    public List<Position> getChecking(Color color) {
-        return Collections.unmodifiableList(checking.get(color));
-    }
-
     @Override
     public boolean canCastle(Color color, PieceType side) {
         return castling[BoardPosition.castlingArrayIndex(color, side)];
@@ -103,7 +101,7 @@ public class ArrayBoardPosition implements BoardPosition {
         ArrayList<Move.MoveCastling> result = new ArrayList<>();
         if(isCheck(turnColor))
             return result;
-        Piece king = pieces.get(PieceType.KING).get(turnColor).get(0);
+        Piece king = kings.get(turnColor);
         if(canCastle(turnColor, PieceType.KING) &&
                 Stream.of(5, 6).noneMatch(x -> board.isOccupied(x, king.pos.y)) &&
                 Stream.of(5, 6).allMatch(x -> board.getThreatening(king.setPos(x, king.pos.y)).isEmpty()))
@@ -122,7 +120,7 @@ public class ArrayBoardPosition implements BoardPosition {
 
         ArrayList<Move> moves = new ArrayList<>(board.getAllSimpleMoves(getTurnColor()));
         for(int i=0; i<moves.size(); ++i) {
-            if(!(moves.get(i) instanceof Move.MoveSimple))  // TODO validte that this works as expected
+            if(!(moves.get(i) instanceof Move.MoveSimple))  // TODO validate that this works as expected
                 continue;
             Move.MoveSimple move = (Move.MoveSimple)moves.get(i);
             if(Rules.isPromotion(board.getPiece(move.posFrom), move.posTo))
@@ -158,27 +156,23 @@ public class ArrayBoardPosition implements BoardPosition {
     @Override
     public boolean isKingValid() {
         for(Color c: Color.values())
-            if(pieces.get(PieceType.KING).get(c).size() != 1)
+            if(pieceCount.get(c).get(PieceType.KING) != 1)
                 return false;
-        Map<Color, ArrayList<Piece>> kings = pieces.get(PieceType.KING);
-        Position kingDistance = kings.get(Color.WHITE).get(0).pos.sub(kings.get(Color.BLACK).get(0).pos);
-        if(Math.abs(kingDistance.x) + Math.abs(kingDistance.y) == 1)
-            return false;
-        return true;
-//        return Stream.of(Color.values()).allMatch(c -> pieces.get(PieceType.KING).get(c).size() == 1) &&
-//                checking.get(turnColor).stream().noneMatch(p -> board.getPiece(p).type == PieceType.KING);
+        Position kingDistance = kings.get(Color.WHITE).pos.sub(kings.get(Color.BLACK).pos);
+        return Math.abs(kingDistance.x) + Math.abs(kingDistance.y) != 1;
     }
 
     @Override
     public boolean isDeadPosition() {
         for(PieceType t: Arrays.asList(PieceType.PAWN, PieceType.ROOK, PieceType.QUEEN))
             for(Color c: Color.values())
-                if(!pieces.get(t).get(c).isEmpty())
+                if(pieceCount.get(c).get(t) > 0)
                     return false;
-        int kB = pieces.get(PieceType.KNIGHT).get(Color.BLACK).size();
-        int kW = pieces.get(PieceType.KNIGHT).get(Color.WHITE).size();
-        int bB = pieces.get(PieceType.BISHOP).get(Color.BLACK).size();
-        int bW = pieces.get(PieceType.BISHOP).get(Color.WHITE).size();
+
+        int kB = pieceCount.get(Color.BLACK).get(PieceType.KNIGHT);
+        int kW = pieceCount.get(Color.WHITE).get(PieceType.KNIGHT);
+        int bB = pieceCount.get(Color.BLACK).get(PieceType.BISHOP);
+        int bW = pieceCount.get(Color.WHITE).get(PieceType.BISHOP);
         int sum = kB + kW + bB + bW;
         if(sum > 2)
             return false;
@@ -187,8 +181,13 @@ public class ArrayBoardPosition implements BoardPosition {
         // sum == 2
         if(!(bB == 1 && bW == 1))
             return false;
-        Position pB = pieces.get(PieceType.BISHOP).get(Color.BLACK).get(0).pos;
-        Position pW = pieces.get(PieceType.BISHOP).get(Color.WHITE).get(0).pos;
+
+        Position pB=null, pW=null;
+        for(Piece piece: board.getAllPieces()) // this should be hopefully ok as it is unlikely case
+            if(piece.type == PieceType.BISHOP) {
+                if (piece.color == Color.WHITE) pW = piece.pos;
+                else pB = piece.pos;
+            }
         return (pB.x + pB.y) % 2 == (pW.x + pW.y) % 2;
     }
 
@@ -199,7 +198,7 @@ public class ArrayBoardPosition implements BoardPosition {
 
     @Override
     public boolean isCheck(Color color) {
-        return !checking.get(color).isEmpty();
+        return inCheck.get(color);
     }
 
     public boolean test() {

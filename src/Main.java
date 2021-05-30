@@ -14,9 +14,9 @@ public class Main {
     public static void main(String[] args) {
         // Helpmates
 //         String xfen = "8/8/N7/8/8/6q1/3K2k1/3b4 b - - 0 1 helpmate 8";
-//         String xfen = "1RrB2b1/8/4n3/2n3p1/2K2b2/1p1rk3/6BR/8 b - - 0 1 helpmate 2";
+         String xfen = "1RrB2b1/8/4n3/2n3p1/2K2b2/1p1rk3/6BR/8 b - - 0 1 helpmate 2";
         // String xfen = "8/8/b7/8/1R4K1/k2N4/8/8 b - - 0 1 helpmate 2";
-         String xfen = "RB6/6kq/8/8/3K4/8/6bb/8 b - - 0 1 helpmate 2";
+//         String xfen = "RB6/6kq/8/8/3K4/8/6bb/8 b - - 0 1 helpmate 2";
 
         // Selfmates
         // String xfen = "8/8/8/7p/4q2k/5Q2/5pKn/2B2BbR w - - 0 1 selfmate 2";

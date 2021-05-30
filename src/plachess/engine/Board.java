@@ -31,6 +31,9 @@ public interface Board {
     /** @return all pieces threatening given piece */
     ArrayList<Position> getThreatening(Piece piece);
 
+    /** @return whether given piece is threatened */
+    boolean isThreatened(Piece piece);
+
     Board set(List<Pair<Position, Piece>> work);
 
 

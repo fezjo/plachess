@@ -33,13 +33,24 @@ public abstract class ArrayBoard implements Board {
         return result;
     }
 
+    /** ignores enpassant */
     @Override
-    public ArrayList<Position> getThreatening(Piece piece) { // TODO enpassant
+    public ArrayList<Position> getThreatening(Piece piece) {
         ArrayList<Position> result = new ArrayList<>();
         for(PieceType type: PieceType.values())
             for(Position pos: implementation.getMoves(new Piece(piece.pos, piece.color, type), this, 2))
                 if(getPiece(pos).type == type)
                     result.add(pos);
         return result;
+    }
+
+    /** ignores enpassant */
+    @Override
+    public boolean isThreatened(Piece piece) {
+        for(PieceType type: PieceType.values())
+            for(Position pos: implementation.getMoves(new Piece(piece.pos, piece.color, type), this, 2))
+                if(getPiece(pos).type == type)
+                    return true;
+        return false;
     }
 }

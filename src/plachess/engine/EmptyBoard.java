@@ -36,6 +36,11 @@ public class EmptyBoard implements Board {
     }
 
     @Override
+    public boolean isThreatened(Piece piece) {
+        return false;
+    }
+
+    @Override
     public Board set(List<Pair<Position, Piece>> work) {
         return this;
     }
