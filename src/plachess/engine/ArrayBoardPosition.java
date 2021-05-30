@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class ArrayBoardPosition implements BoardPosition {
+    public static int spawnCount=0;
+
     private final Board board;
     private final Color turnColor;
     private final boolean[] castling;
@@ -12,11 +14,13 @@ public class ArrayBoardPosition implements BoardPosition {
 
     private Map<PieceType, Map<Color, ArrayList<Piece>>> pieces;
     private Map<Color, ArrayList<Position>> checking;
+    private ArrayList<BoardPosition> nextMoves;
 
     public ArrayBoardPosition(
             Board board, Color turnColor,
             boolean[] castling, Position enpassant,
             int halfMoveClock, int fullMoveClock) {
+        spawnCount += 1;
         this.board = board;
         this.turnColor = turnColor;
         this.castling = castling;
@@ -27,9 +31,9 @@ public class ArrayBoardPosition implements BoardPosition {
     }
 
     private void initialize() {
-        pieces = new HashMap<>();
+        pieces = new EnumMap<>(PieceType.class);
         for(PieceType pt: PieceType.values()) {
-            pieces.put(pt, new HashMap<>());
+            pieces.put(pt, new EnumMap<>(Color.class));
             for (Color c : Color.values())
                 pieces.get(pt).put(c, new ArrayList<>());
         }
@@ -37,12 +41,14 @@ public class ArrayBoardPosition implements BoardPosition {
         for(Piece piece: board.getAllPieces())
             pieces.get(piece.type).get(piece.color).add(piece);
 
-        checking = new HashMap<>();
+        checking = new EnumMap<>(Color.class);
         for(Color color: Color.values())
             checking.put(color, new ArrayList<Position>());
         if(isKingValid())   // we will not look for checking pieces if kings are not meeting chess rules
             for(Color color: Color.values())
                 checking.put(color, board.getThreatening(pieces.get(PieceType.KING).get(color).get(0)));
+
+        nextMoves = null;
     }
 
     public ArrayBoardPosition getAfterMove(Move move) {
@@ -110,7 +116,10 @@ public class ArrayBoardPosition implements BoardPosition {
     }
 
     @Override
-    public ArrayList<BoardPosition> getMoves() {
+    public List<BoardPosition> getMoves() {
+        if(nextMoves != null)
+            return nextMoves;
+
         ArrayList<Move> moves = new ArrayList<>(board.getAllSimpleMoves(getTurnColor()));
         for(int i=0; i<moves.size(); ++i) {
             if(!(moves.get(i) instanceof Move.MoveSimple))  // TODO validte that this works as expected
@@ -135,21 +144,29 @@ public class ArrayBoardPosition implements BoardPosition {
 
         moves.addAll(getCastlingMoves());
 
-        ArrayList<BoardPosition> result = new ArrayList<>();
+        ArrayList<BoardPosition> nextMoves = new ArrayList<>();
         for(Move move: moves) {
             ArrayBoardPosition newBP = move.apply(this);
             if(!newBP.isKingValid() || newBP.isCheck(turnColor))
                 continue;
-            result.add(newBP);
+            nextMoves.add(newBP);
         }
 
-        return result;
+        return nextMoves;
     }
 
     @Override
     public boolean isKingValid() {
-        return Stream.of(Color.values()).allMatch(c -> pieces.get(PieceType.KING).get(c).size() == 1) &&
-                checking.get(turnColor).stream().noneMatch(p -> board.getPiece(p).type == PieceType.KING);
+        for(Color c: Color.values())
+            if(pieces.get(PieceType.KING).get(c).size() != 1)
+                return false;
+        Map<Color, ArrayList<Piece>> kings = pieces.get(PieceType.KING);
+        Position kingDistance = kings.get(Color.WHITE).get(0).pos.sub(kings.get(Color.BLACK).get(0).pos);
+        if(Math.abs(kingDistance.x) + Math.abs(kingDistance.y) == 1)
+            return false;
+        return true;
+//        return Stream.of(Color.values()).allMatch(c -> pieces.get(PieceType.KING).get(c).size() == 1) &&
+//                checking.get(turnColor).stream().noneMatch(p -> board.getPiece(p).type == PieceType.KING);
     }
 
     @Override

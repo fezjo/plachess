@@ -10,19 +10,17 @@ import java.util.List;
  * row and column numberings are from 0 to 7
  */
 public interface Board {
-    Board clone();
-
-    boolean isOccupied(Position pos);
+    default boolean isOccupied(Position pos) { return isOccupied(pos.x, pos.y); };
     default boolean isOccupied(int x, int y) { return isOccupied(new Position(x, y)); }
 
     /**
      * can throw exception if pos is not valid
      * @return Piece at position if occupied, otherwise null
      */
-    Piece getPiece(Position pos);
+    default Piece getPiece(Position pos) { return getPiece(pos.x, pos.y); };
     default Piece getPiece(int x, int y) { return getPiece(new Position(x, y)); }
 
-    ArrayList<Piece> getAllPieces();
+    List<Piece> getAllPieces();
 
     /** @return all possible simple moves (travel, capture) by piece on given position */
     ArrayList<Move.MoveSimple> getSimpleMoves(Position pos);

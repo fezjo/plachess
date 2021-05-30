@@ -17,7 +17,7 @@ public class SelfmateSolver implements Solver {
 
     /** @return the minimum full move clock or -1 if unsolvable.*/
      private static int recurse(BoardPosition state,int max_depth){
-        if (state.getTurnColor() == Color.WHITE && state.isCheckMate()){
+        if (state.getTurnColor() == Color.WHITE && state.isCheckMate()){ // TODO what if BLACK did checkmate?
             return state.getFullMoveClock();
         }
         if (max_depth == 0 || state.isDraw() || state.canCallDraw()){

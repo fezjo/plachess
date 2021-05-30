@@ -16,23 +16,23 @@ public class HelpmateSolver implements Solver {
     private Integer numOfSolutions;
 
     /** @return the minimum full move clock or -1 if unsolvable.*/
-     private static int recurse(BoardPosition state,int max_depth){
-        if (state.getTurnColor() == Color.BLACK && state.isCheckMate()){
-            return state.getFullMoveClock();
-        }
-        if (max_depth == 0 || state.isDraw()){
-            return -1;
-        }
-        int best = -1;
+    private static int recurse(BoardPosition state, int maxDepth){
+        int fail = maxDepth + 1;
+        if(maxDepth < 0)
+            return fail;
+        Color turnColor = state.getTurnColor();
+
+        if(state.isCheckMate())
+            return turnColor == Color.BLACK ? 0 : fail;
+        if (maxDepth == 0 || state.isDraw())
+            return fail;
+
+        int searchDepth = maxDepth;
         for (BoardPosition nextState : state.getMoves()){
-            int numOfMoves = recurse(nextState, max_depth-1);
-            if (numOfMoves != -1) {
-                if (best == -1 || numOfMoves < best){
-                    best = numOfMoves;
-                }
-            }
+            int foundDepth = recurse(nextState, searchDepth - 1) + 1;
+            searchDepth = Math.min(searchDepth, foundDepth - 1);
         }
-        return best;
+        return searchDepth + 1;
     }
 
     public HelpmateSolver(BoardPosition state, int n) {
@@ -45,11 +45,12 @@ public class HelpmateSolver implements Solver {
         solutions = new ArrayList<BoardPosition>();
         numsOfMoves = new ArrayList<Integer>();
         numOfSolutions = 0;
+        int searchDepth = 2*n-1;
         for (BoardPosition nextState : state.getMoves()){
-            int numOfMoves = recurse(nextState, 2*n-1);
-            if (numOfMoves != -1){
+            int numOfMoves = recurse(nextState, searchDepth);
+            if (numOfMoves <= searchDepth){
                 solutions.add(nextState);
-                numsOfMoves.add(numOfMoves - state.getFullMoveClock());
+                numsOfMoves.add((numOfMoves + 1) / 2);
                 numOfSolutions += 1;
             }
         }

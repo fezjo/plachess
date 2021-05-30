@@ -4,50 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ArrayBoard implements Board {
+public abstract class ArrayBoard implements Board {
     private final static ArrayBoardImplementation implementation = new ArrayBoardImplementation();
-    private Piece[][] grid;
-
-    public ArrayBoard() {
-        grid = new Piece[Rules.BOARD_SIZE][Rules.BOARD_SIZE];
-    }
-
-    public ArrayBoard(ArrayBoard board) {
-        this();
-        for(int y=0; y<grid.length; ++y)
-            grid[y] = board.grid[y].clone();
-    }
-
-    public ArrayBoard(Piece[][] board) {
-        this();
-        for(int y=0; y<grid.length; ++y)
-            grid[y] = board[y].clone();
-    }
-
-    @Override
-    public ArrayBoard clone() {
-        return new ArrayBoard(this);
-    }
-
-    @Override
-    public boolean isOccupied(Position pos) {
-        return !Piece.isEmpty(getPiece(pos));
-    }
-
-    @Override
-    public Piece getPiece(Position pos) {
-        return grid[pos.y][pos.x];
-    }
-
-    @Override
-    public ArrayList<Piece> getAllPieces() {
-        ArrayList<Piece> result = new ArrayList<>();
-        for(int y=0; y<grid.length; ++y)
-            for(int x=0; x<grid[y].length; ++x)
-                if(isOccupied(x, y))
-                    result.add(getPiece(x, y));
-        return result;
-    }
 
     /**
      * returns null if position is not occupied,
@@ -76,40 +34,12 @@ public class ArrayBoard implements Board {
     }
 
     @Override
-    public ArrayList<Position> getThreatening(Piece piece) {
+    public ArrayList<Position> getThreatening(Piece piece) { // TODO enpassant
         ArrayList<Position> result = new ArrayList<>();
         for(PieceType type: PieceType.values())
-            result.addAll(implementation.getMoves(
-                    new Piece(piece.pos, piece.color, type),
-                    this, 2).stream().filter(
-                            pos -> getPiece(pos).type == type
-                    ).collect(Collectors.toList()));
+            for(Position pos: implementation.getMoves(new Piece(piece.pos, piece.color, type), this, 2))
+                if(getPiece(pos).type == type)
+                    result.add(pos);
         return result;
-    }
-
-    @Override
-    public ArrayBoard set(List<Pair<Position, Piece>> work) {
-        ArrayBoard result = new ArrayBoard(this);
-        for(Pair<Position, Piece> p: work) {
-            Position pos = p.frst;
-            if (p.scnd == null)
-                result.grid[pos.y][pos.x] = null;
-            else
-                result.grid[pos.y][pos.x] = p.scnd.setPos(pos);
-        }
-        return result;
-    }
-
-    public static boolean test() {
-        String xfen = "rnbqkbnr/ppp1pppp/3p4/8/8/8/PPPPPPPP/RNBQKBNR";
-        ArrayBoard board = (ArrayBoard)Board.fromXFEN(new ArrayBoard(), xfen);
-        System.out.println(board.getPiece(0, 0));
-        System.out.println(xfen);
-        System.out.println(board.toXFEN());
-        System.out.println(board.toStringGrid());
-        System.out.println(board.getAllPieces());
-        System.out.println(board.getAllSimpleMoves(Color.WHITE));
-        System.out.println(board.getAllSimpleMoves(Color.BLACK));
-        return true;
     }
 }

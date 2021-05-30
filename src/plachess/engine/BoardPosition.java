@@ -41,7 +41,7 @@ public interface BoardPosition {
      * returned BoardPositions can be in check or draw (make sure by calling isDraw)
      * @return all BoardPositions created by a valid move from this BoardPosition
      */
-    ArrayList<BoardPosition> getMoves();
+    List<BoardPosition> getMoves();
 
     /**
      * either side has exactly one, kings do not threaten each other
@@ -106,5 +106,33 @@ public interface BoardPosition {
      */
     public static boolean allMovesCheck(List<BoardPosition> next, Color color) {
         return next.stream().allMatch(x -> x.isCheck(color));
+    }
+
+    public static BoardPosition fromXFEN(String xfen, Board board){
+        String[] field = xfen.split(" ");
+
+        board = Board.fromXFEN(board, field[0]);
+
+        Color turnColor = field[1].equals("w") ? Color.WHITE : Color.BLACK;
+        boolean[] castling = {false, false, false, false};
+        if(field[2].contains("K"))
+            castling[0] = true;
+        if(field[2].contains("Q"))
+            castling[1] = true;
+        if(field[2].contains("k"))
+            castling[2] = true;
+        if(field[2].contains("q"))
+            castling[3] = true;
+
+        Position enpassant = null;
+        if (!field[3].equals("-")){
+            enpassant = new Position(field[3].charAt(0) - 'a',field[3].charAt(1) - '1');
+        }
+
+        int halfmoveClock = Integer.parseInt(field[4]);
+        int fullmoveClock = Integer.parseInt(field[5]);
+
+        return new ArrayBoardPosition(
+                board, turnColor, castling, enpassant, halfmoveClock, fullmoveClock);
     }
 }

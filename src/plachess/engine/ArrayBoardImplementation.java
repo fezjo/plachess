@@ -7,8 +7,8 @@ public class ArrayBoardImplementation {
     private final Map<PieceType, Integer> MOVE_RANGE;
 
     public ArrayBoardImplementation() {
-        MOVE_DIRECTIONS = new HashMap<>();
-        MOVE_RANGE = new HashMap<>();
+        MOVE_DIRECTIONS = new EnumMap<>(PieceType.class);
+        MOVE_RANGE = new EnumMap<>(PieceType.class);
 
         MOVE_DIRECTIONS.put(PieceType.KNIGHT, Arrays.asList(
                 new Position(-2, -1),
@@ -55,7 +55,7 @@ public class ArrayBoardImplementation {
     /**
      * @return all reachable positions on board as if it was empty
      */
-    public ArrayList<Position> getUnobstructedMoves(Piece piece) {
+    public List<Position> getUnobstructedMoves(Piece piece) {
         return getMoves(piece, new EmptyBoard(), 1);
     }
 
@@ -63,7 +63,7 @@ public class ArrayBoardImplementation {
      * @param mask 1=travel 2=capture
      * @return all reachable positions on board with regard to other pieces
      */
-    public ArrayList<Position> getMoves(Piece piece, Board board, int mask) {
+    public List<Position> getMoves(Piece piece, Board board, int mask) {
         if (piece.type == PieceType.EMPTY)
             return new ArrayList<Position>();
         if(piece.type == PieceType.PAWN)
@@ -90,7 +90,7 @@ public class ArrayBoardImplementation {
     }
 
     /** @param mask 1=travel 2=capture */
-    private ArrayList<Position> getMovesPawn(Piece piece, Board board, int mask) {
+    private List<Position> getMovesPawn(Piece piece, Board board, int mask) {
         boolean retTravel=(mask&1)!=0,
                 retCapture=(mask&2)!=0;
         ArrayList<Position> result = new ArrayList<>();

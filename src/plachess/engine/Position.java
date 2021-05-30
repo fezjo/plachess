@@ -14,10 +14,13 @@ public class Position {
     public boolean isValid() { return x >= 0 && x < Rules.BOARD_SIZE && y >= 0 && y < Rules.BOARD_SIZE; }
     public Position add(Position that) { return new Position(this.x+that.x, this.y+that.y); }
     public Position add(int x, int y) { return new Position(this.x+x, this.y+y); }
+    public Position sub(Position that) { return new Position(this.x-that.x, this.y-that.y); }
+    public Position sub(int x, int y) { return new Position(this.x-x, this.y-y); }
 
     @Override
     public int hashCode() {
         return Objects.hash(x, y);
+//        return y * Rules.BOARD_SIZE + x;
     }
 
     @Override
