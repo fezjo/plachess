@@ -25,7 +25,9 @@ public interface Move {
     static boolean[] updateCastling(boolean[] castling, Piece moved) {
         boolean[] result = castling.clone();
 
-        if(moved.type == PieceType.KING) {
+        if(Piece.isEmpty(moved))
+            return result;
+        else if(moved.type == PieceType.KING) {
             loseCastling(result, moved.color, null);
         } else if(moved.type == PieceType.ROOK) {
             if(moved.color == Color.WHITE) {
@@ -81,7 +83,7 @@ public interface Move {
                     (capturing && pieceFrom.color == pieceTo.color))
                 return null;
 
-            boolean[] newCastling = Move.updateCastling(bp.getCastling(), pieceFrom);
+            boolean[] newCastling = Move.updateCastling(Move.updateCastling(bp.getCastling(), pieceFrom), pieceTo);
             Position newEnpassant = Move.updateEnpassant(pieceFrom, posTo);
             Color newTurnColor = bp.getTurnColor().opposite();
 

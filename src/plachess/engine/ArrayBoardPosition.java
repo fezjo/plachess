@@ -104,11 +104,11 @@ public class ArrayBoardPosition implements BoardPosition {
         Piece king = kings.get(turnColor);
         if(canCastle(turnColor, PieceType.KING) &&
                 Stream.of(5, 6).noneMatch(x -> board.isOccupied(x, king.pos.y)) &&
-                Stream.of(5, 6).allMatch(x -> board.getThreatening(king.setPos(x, king.pos.y)).isEmpty()))
+                Stream.of(5, 6).noneMatch(x -> board.isThreatened(king.setPos(x, king.pos.y))))
             result.add(new Move.MoveCastling(turnColor, PieceType.KING));
         if(canCastle(turnColor, PieceType.QUEEN) &&
                 Stream.of(1, 2, 3).noneMatch(x -> board.isOccupied(x, king.pos.y)) &&
-                Stream.of(2, 3).allMatch(x -> board.getThreatening(king.setPos(x, king.pos.y)).isEmpty()))
+                Stream.of(2, 3).noneMatch(x -> board.isThreatened(king.setPos(x, king.pos.y))))
             result.add(new Move.MoveCastling(turnColor, PieceType.QUEEN));
         return result;
     }
