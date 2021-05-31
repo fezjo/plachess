@@ -30,6 +30,7 @@ public class HelpmateSolver implements Solver {
         int searchDepth = maxDepth;
         for (BoardPosition nextState : state.getNextPositions()){
             int foundDepth = recurse(nextState, searchDepth - 1) + 1;
+            nextState.destroy();
             searchDepth = Math.min(searchDepth, foundDepth - 1);
         }
         return searchDepth + 1;

@@ -3,6 +3,8 @@ package plachess.engine;
 import java.util.List;
 
 public interface BoardPosition {
+    void destroy();
+
     /** @return reference to board */
     Board getBoard();
     Color getTurnColor();

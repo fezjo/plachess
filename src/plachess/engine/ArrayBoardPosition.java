@@ -54,6 +54,10 @@ public class ArrayBoardPosition implements BoardPosition {
         nextMoves = null;
     }
 
+    public void destroy() {
+        nextMoves = null;
+    }
+
     public ArrayBoardPosition getAfterMove(Move move) {
         return move.apply(this).frst;
     }
