@@ -11,14 +11,14 @@ import java.util.List;
  */
 public interface Board {
     default boolean isOccupied(Position pos) { return isOccupied(pos.x, pos.y); };
-    default boolean isOccupied(int x, int y) { return isOccupied(new Position(x, y)); }
+    default boolean isOccupied(int x, int y) { return isOccupied(Position.getNew(x, y)); }
 
     /**
      * can throw exception if pos is not valid
      * @return Piece at position if occupied, otherwise null
      */
     default Piece getPiece(Position pos) { return getPiece(pos.x, pos.y); };
-    default Piece getPiece(int x, int y) { return getPiece(new Position(x, y)); }
+    default Piece getPiece(int x, int y) { return getPiece(Position.getNew(x, y)); }
 
     List<Piece> getAllPieces();
 
@@ -48,7 +48,7 @@ public interface Board {
                 if(!Rules.char2piece.containsKey(c))
                     x += c - '0';
                 else {
-                    instructions.add(new Pair<>(new Position(x, y), Rules.char2piece.get(c)));
+                    instructions.add(new Pair<>(Position.getNew(x, y), Rules.char2piece.get(c)));
                     ++x;
                 }
             }

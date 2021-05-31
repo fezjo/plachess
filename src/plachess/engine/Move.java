@@ -155,8 +155,8 @@ public interface Move {
             int newFullMoveClock = bp.getFullMoveClock() + clockChange;
 
             int homeRow = Rules.getColorHomeRow(color);
-            Position posRook = new Position(this.side == PieceType.KING ? Rules.BORDER_KING : Rules.BORDER_QUEEN, homeRow);
-            Position posKing = new Position(Rules.COL_KING, homeRow);
+            Position posRook = Position.getNew(this.side == PieceType.KING ? Rules.BORDER_KING : Rules.BORDER_QUEEN, homeRow);
+            Position posKing = Position.getNew(Rules.COL_KING, homeRow);
             int dirKing = (int)Math.signum(posRook.x - posKing.x);
             Board newBoard = oldBoard.set(Arrays.asList(
                         new Pair<>(posKing, Piece.empty()),
@@ -284,7 +284,7 @@ public interface Move {
             if(!posFrom.isValid() || !posTo.isValid())
                 return null;
             Board oldBoard = bp.getBoard();
-            Position posAttacked = new Position(posTo.x, posFrom.y);
+            Position posAttacked = Position.getNew(posTo.x, posFrom.y);
 
             // valid capturing
             Piece pieceFrom = oldBoard.getPiece(posFrom);

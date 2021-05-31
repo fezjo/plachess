@@ -19,11 +19,11 @@ public interface BoardPosition {
     int getFullMoveClock();
 
     Piece getPiece(Position pos);
-    default Piece getPiece(int x, int y) { return getPiece(new Position(x, y)); }
+    default Piece getPiece(int x, int y) { return getPiece(Position.getNew(x, y)); }
     PieceType getPieceType(Position pos);
-    default PieceType getPieceType(int x, int y) { return getPieceType(new Position(x, y)); }
+    default PieceType getPieceType(int x, int y) { return getPieceType(Position.getNew(x, y)); }
     Color getPieceColor(Position pos);
-    default Color getPieceColor(int x, int y)  { return getPieceColor(new Position(x, y)); }
+    default Color getPieceColor(int x, int y)  { return getPieceColor(Position.getNew(x, y)); }
 
     boolean canCastle(Color color, PieceType side);
 
@@ -130,7 +130,7 @@ public interface BoardPosition {
 
         Position enpassant = null;
         if (!field[3].equals("-")){
-            enpassant = new Position(field[3].charAt(0) - 'a',field[3].charAt(1) - '1');
+            enpassant = Position.getNew(field[3].charAt(0) - 'a',field[3].charAt(1) - '1');
         }
 
         int halfmoveClock = Integer.parseInt(field[4]);

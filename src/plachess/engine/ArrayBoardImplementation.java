@@ -1,6 +1,7 @@
 package plachess.engine;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class ArrayBoardImplementation {
     private final Map<PieceType, List<Position>> MOVE_DIRECTIONS;
@@ -11,37 +12,37 @@ public class ArrayBoardImplementation {
         MOVE_RANGE = new EnumMap<>(PieceType.class);
 
         MOVE_DIRECTIONS.put(PieceType.KNIGHT, Arrays.asList(
-                new Position(-2, -1),
-                new Position(-2, +1),
-                new Position(-1, -2),
-                new Position(-1, +2),
-                new Position(+1, -2),
-                new Position(+1, +2),
-                new Position(+2, -1),
-                new Position(+2, +1)
+                Position.getNew(-2, -1),
+                Position.getNew(-2, +1),
+                Position.getNew(-1, -2),
+                Position.getNew(-1, +2),
+                Position.getNew(+1, -2),
+                Position.getNew(+1, +2),
+                Position.getNew(+2, -1),
+                Position.getNew(+2, +1)
         ));
         MOVE_DIRECTIONS.put(PieceType.ULTRA_KNIGHT, MOVE_DIRECTIONS.get(PieceType.KNIGHT));
         MOVE_DIRECTIONS.put(PieceType.BISHOP, Arrays.asList(
-                new Position(-1, -1),
-                new Position(-1, +1),
-                new Position(+1, -1),
-                new Position(+1, +1)
+                Position.getNew(-1, -1),
+                Position.getNew(-1, +1),
+                Position.getNew(+1, -1),
+                Position.getNew(+1, +1)
         ));
         MOVE_DIRECTIONS.put(PieceType.ROOK, Arrays.asList(
-                new Position(-1, 0),
-                new Position(0, -1),
-                new Position(0, +1),
-                new Position(+1, 0)
+                Position.getNew(-1, 0),
+                Position.getNew(0, -1),
+                Position.getNew(0, +1),
+                Position.getNew(+1, 0)
         ));
         MOVE_DIRECTIONS.put(PieceType.QUEEN, Arrays.asList(
-                new Position(-1, -1),
-                new Position(-1, 0),
-                new Position(-1, +1),
-                new Position(0, -1),
-                new Position(0, +1),
-                new Position(+1, -1),
-                new Position(+1, 0),
-                new Position(+1, +1)
+                Position.getNew(-1, -1),
+                Position.getNew(-1, 0),
+                Position.getNew(-1, +1),
+                Position.getNew(0, -1),
+                Position.getNew(0, +1),
+                Position.getNew(+1, -1),
+                Position.getNew(+1, 0),
+                Position.getNew(+1, +1)
         ));
         MOVE_DIRECTIONS.put(PieceType.KING, MOVE_DIRECTIONS.get(PieceType.QUEEN));
         MOVE_RANGE.put(PieceType.KNIGHT, 1);
@@ -90,12 +91,12 @@ public class ArrayBoardImplementation {
     }
 
     /** @param mask 1=travel 2=capture */
-    private List<Position> getMovesPawn(Piece piece, Board board, int mask) {
+    public List<Position> getMovesPawn(Piece piece, Board board, int mask) {
         boolean retTravel=(mask&1)!=0,
                 retCapture=(mask&2)!=0;
         ArrayList<Position> result = new ArrayList<>();
         int homeRow = Rules.getColorHomeRow(piece.color);
-        Position direction = new Position(0, Rules.getColorDirection(piece.color));
+        Position direction = Position.getNew(0, Rules.getColorDirection(piece.color));
         boolean hasMoved = Rules.isPawnMoved(piece.pos, piece.color);
 
         Position next = piece.pos.add(direction);
@@ -111,7 +112,7 @@ public class ArrayBoardImplementation {
         }
         if(retCapture) {
             for (int x = -1; x < 2; x += 2) {
-                next = piece.pos.add(new Position(x, direction.y));
+                next = piece.pos.add(Position.getNew(x, direction.y));
                 if (next.isValid() && board.isOccupied(next) && board.getPiece(next).color != piece.color)
                     result.add(next);
             }

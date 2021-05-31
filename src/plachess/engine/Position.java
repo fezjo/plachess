@@ -1,21 +1,42 @@
 package plachess.engine;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
  * @Immutable
  */
 public class Position {
+    private static final int MAX_CACHE = 16;
+    private static final ArrayList<Position> cachePool;
+
+    static {
+        cachePool = new ArrayList<>();
+        for(int y=-MAX_CACHE; y <= MAX_CACHE; ++y) {
+            for(int x=-MAX_CACHE; x <= MAX_CACHE; ++x) {
+                cachePool.add(new Position(x, y));
+            }
+        }
+    }
+
+    public static Position getNew(int x, int y) {
+//        return new Position(x, y);
+        if(Math.max(Math.abs(y), Math.abs(x)) > MAX_CACHE)
+            return new Position(x, y);
+        return cachePool.get((y + MAX_CACHE) * (MAX_CACHE * 2 + 1) + (x + MAX_CACHE));
+    }
+
     public final int x, y;
 
-    public Position() { x = 0; y = 0; }
-    public Position(int x, int y) { this.x = x; this.y = y; }
-    public Position(Position p) { x = p.x; y = p.y; }
+    private Position() { x = 0; y = 0; }
+    private Position(int x, int y) { this.x = x; this.y = y; }
+    private Position(Position p) { x = p.x; y = p.y; }
+
     public boolean isValid() { return x >= 0 && x < Rules.BOARD_SIZE && y >= 0 && y < Rules.BOARD_SIZE; }
-    public Position add(Position that) { return new Position(this.x+that.x, this.y+that.y); }
-    public Position add(int x, int y) { return new Position(this.x+x, this.y+y); }
-    public Position sub(Position that) { return new Position(this.x-that.x, this.y-that.y); }
-    public Position sub(int x, int y) { return new Position(this.x-x, this.y-y); }
+    public Position add(Position that) { return Position.getNew(this.x+that.x, this.y+that.y); }
+    public Position add(int x, int y) { return Position.getNew(this.x+x, this.y+y); }
+    public Position sub(Position that) { return Position.getNew(this.x-that.x, this.y-that.y); }
+    public Position sub(int x, int y) { return Position.getNew(this.x-x, this.y-y); }
 
     @Override
     public int hashCode() {

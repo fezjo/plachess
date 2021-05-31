@@ -14,7 +14,7 @@ public class Piece {
     public static boolean isEmpty(Piece p) { return p == null || p.type == PieceType.EMPTY; }
 
     public Piece(int x, int y, Color color, PieceType type) {
-        this(new Position(x, y), color, type);
+        this(Position.getNew(x, y), color, type);
     }
 
     public Piece(Position pos, Color color, PieceType type) {
