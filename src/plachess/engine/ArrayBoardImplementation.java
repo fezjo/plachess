@@ -100,9 +100,10 @@ public class ArrayBoardImplementation {
 
         Position next = piece.pos.add(direction);
         if(retTravel) {
-            if (next.isValid() && !board.isOccupied(next))
+            boolean blocked = board.isOccupied(next);
+            if (next.isValid() && !blocked)
                 result.add(next);
-            if (!hasMoved) {
+            if (!hasMoved && !blocked) {
                 next = next.add(direction);
                 if (next.isValid() && !board.isOccupied(next))
                     result.add(next);

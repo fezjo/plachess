@@ -28,7 +28,7 @@ public class HelpmateSolver implements Solver {
             return fail;
 
         int searchDepth = maxDepth;
-        for (BoardPosition nextState : state.getMoves()){
+        for (BoardPosition nextState : state.getNextPositions()){
             int foundDepth = recurse(nextState, searchDepth - 1) + 1;
             searchDepth = Math.min(searchDepth, foundDepth - 1);
         }
@@ -46,7 +46,7 @@ public class HelpmateSolver implements Solver {
         numsOfMoves = new ArrayList<Integer>();
         numOfSolutions = 0;
         int searchDepth = 2*n-1;
-        for (BoardPosition nextState : state.getMoves()){
+        for (BoardPosition nextState : state.getNextPositions()){
             int numOfMoves = recurse(nextState, searchDepth);
             if (numOfMoves <= searchDepth){
                 solutions.add(nextState);

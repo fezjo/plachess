@@ -151,7 +151,7 @@ public interface Move {
             int newFullMoveClock = bp.getFullMoveClock() + clockChange;
 
             int homeRow = Rules.getColorHomeRow(color);
-            Position posRook = new Position(Rules.BORDER_KING, homeRow);
+            Position posRook = new Position(this.side == PieceType.KING ? Rules.BORDER_KING : Rules.BORDER_QUEEN, homeRow);
             Position posKing = new Position(Rules.COL_KING, homeRow);
             int dirKing = (int)Math.signum(posRook.x - posKing.x);
             Board newBoard = oldBoard.set(Arrays.asList(
@@ -218,8 +218,7 @@ public interface Move {
                 return null;
 
             // valid pawn promotion
-            if(pieceFrom.type != PieceType.PAWN ||
-                    posTo.y != Rules.getColorHomeRow(pieceFrom.color.opposite()))
+            if(!Move.isPromoted(pieceFrom, posTo))
                 return null;
 
             Color newTurnColor = bp.getTurnColor().opposite();
@@ -279,20 +278,23 @@ public interface Move {
             if(!posFrom.isValid() || !posTo.isValid())
                 return null;
             Board oldBoard = bp.getBoard();
+            Position posAttacked = new Position(posTo.x, posFrom.y);
 
             // valid capturing
             Piece pieceFrom = oldBoard.getPiece(posFrom);
             Piece pieceTo = oldBoard.getPiece(posTo);
-            boolean capturing = !Piece.isEmpty(pieceTo);
-            if(Piece.isEmpty(pieceFrom) || pieceFrom.color != bp.getTurnColor() ||
-                    (capturing && pieceFrom.color == pieceTo.color))
+            Piece pieceAttacked = oldBoard.getPiece(posAttacked);
+            if(Piece.isEmpty(pieceFrom) || pieceFrom.color != bp.getTurnColor()
+                    || Piece.isEmpty(pieceAttacked) || pieceFrom.color == pieceAttacked.color
+                    || !Piece.isEmpty(pieceTo))
                 return null;
 
             // valid enpassant
             ArrayList<Position> enpositions = Rules.getEnpassantInvolvedPositions(bp.getEnpassant());
-            if(!(pieceFrom.type == PieceType.PAWN && capturing && pieceTo.type == PieceType.PAWN &&
-                    enpositions != null && enpositions.get(0).equals(posTo) &&
-                    enpositions.stream().skip(1).anyMatch(p -> p.equals(pieceFrom.pos))))
+            if(!(pieceFrom.type == PieceType.PAWN && pieceAttacked.type == PieceType.PAWN &&
+                    enpositions != null &&
+                    enpositions.get(0).equals(posAttacked) && enpositions.get(1).equals(posTo) &&
+                    enpositions.stream().skip(2).anyMatch(p -> p.equals(pieceFrom.pos))))
                 return null;
 
             Color newTurnColor = bp.getTurnColor().opposite();
@@ -303,7 +305,7 @@ public interface Move {
 
             Board newBoard = oldBoard.set(Arrays.asList(
                     new Pair<>(posFrom, Piece.empty()),
-                    new Pair<>(enpositions.get(0), Piece.empty()),
+                    new Pair<>(posAttacked, Piece.empty()),
                     new Pair<>(posTo, pieceFrom)
             ));
 

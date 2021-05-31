@@ -1,6 +1,5 @@
 package plachess.engine;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface BoardPosition {
@@ -41,7 +40,7 @@ public interface BoardPosition {
      * returned BoardPositions can be in check or draw (make sure by calling isDraw)
      * @return all BoardPositions created by a valid move from this BoardPosition
      */
-    List<BoardPosition> getMoves();
+    List<BoardPosition> getNextPositions();
 
     /**
      * either side has exactly one, kings do not threaten each other
@@ -67,7 +66,7 @@ public interface BoardPosition {
      * will not check for fivefold repetition rule
      * @return whether the current position is draw
      */
-    default boolean isDraw() { return BoardPosition.isDraw(this, getMoves(), getTurnColor()); }
+    default boolean isDraw() { return BoardPosition.isDraw(this, getNextPositions(), getTurnColor()); }
 
     /** @return whether the color is in check */
     boolean isCheck(Color color);
@@ -77,7 +76,7 @@ public interface BoardPosition {
      * can be slow, use wisely
      * @return whether the color currently on turn has won
      */
-    default boolean isCheckMate() { return BoardPosition.isCheckMate(this, getMoves(), getTurnColor()); }
+    default boolean isCheckMate() { return BoardPosition.isCheckMate(this, getNextPositions(), getTurnColor()); }
 
     /**
      * will check for not being in check and not having legal move, dead positions, seventy-five-move rule

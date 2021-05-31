@@ -1,8 +1,6 @@
 package plachess.engine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,15 +33,18 @@ public interface Rules {
         return side == PieceType.KING || side == PieceType.QUEEN;
     }
 
+    /** returns list of positions important for evaluation of enpassant move
+     * order being [removedPawn, attackingAfter, attackingBeforeLeft, attackingBeforeRight
+     */
     static ArrayList<Position> getEnpassantInvolvedPositions(Position enpassant) {
         if(enpassant == null)
             return null;
         int dirY = enpassant.y < 4 ? 1 : -1;
         ArrayList<Position> result = new ArrayList<>();
-        Position endangered = enpassant.add(0, dirY);
-        result.add(endangered);
-        for(int x=-1; x<2; ++x) {
-            Position attacking = enpassant.add(1, dirY);
+        result.add(enpassant.add(0, dirY)); // victim pawn
+        result.add(enpassant); // where attacker will end up
+        for(int x = -1; x < 2; x += 2) { // both possible attackers
+            Position attacking = enpassant.add(x, dirY);
             if (attacking.isValid())
                 result.add(attacking);
         }
@@ -72,4 +73,11 @@ public interface Rules {
                     Map.Entry::getValue,
                     e -> new Piece(null, e.getKey().frst,  e.getKey().scnd)
             )));
+
+    List<PieceType> PAWN_PROMOTION_OPTIONS = new ArrayList<>(Arrays.asList(
+            PieceType.KNIGHT,
+            PieceType.BISHOP,
+            PieceType.ROOK,
+            PieceType.QUEEN
+    ));
 }

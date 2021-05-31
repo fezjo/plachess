@@ -25,7 +25,7 @@ public class SelfmateSolver implements Solver {
         }
         int best = -1;
         if (state.getTurnColor() == Color.WHITE){
-            for (BoardPosition nextState : state.getMoves()){
+            for (BoardPosition nextState : state.getNextPositions()){
                 int numOfMoves = recurse(nextState, max_depth-1);
                 if (numOfMoves != -1) {
                     if (best == -1 || numOfMoves < best){
@@ -34,7 +34,7 @@ public class SelfmateSolver implements Solver {
                 }
             }
         }else{
-            for (BoardPosition nextState : state.getMoves()){
+            for (BoardPosition nextState : state.getNextPositions()){
                 int numOfMoves = recurse(nextState, max_depth-1);
                 if (numOfMoves != -1) {
                     if (best == -1 || numOfMoves > best){
@@ -59,7 +59,7 @@ public class SelfmateSolver implements Solver {
         solutions = new ArrayList<BoardPosition>();
         numsOfMoves = new ArrayList<Integer>();
         numOfSolutions = 0;
-        for (BoardPosition nextState : state.getMoves()){
+        for (BoardPosition nextState : state.getNextPositions()){
             int numOfMoves = recurse(nextState, 2*n-1);
             if (numOfMoves != -1){
                 solutions.add(nextState);

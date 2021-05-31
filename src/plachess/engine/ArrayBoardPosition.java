@@ -113,28 +113,30 @@ public class ArrayBoardPosition implements BoardPosition {
         return result;
     }
 
-    @Override
-    public List<BoardPosition> getMoves() {
-        if(nextMoves != null)
-            return nextMoves;
-
+    private List<Move> getMoves() {
         ArrayList<Move> moves = new ArrayList<>(board.getAllSimpleMoves(getTurnColor()));
-        for(int i=0; i<moves.size(); ++i) {
-            if(!(moves.get(i) instanceof Move.MoveSimple))  // TODO validate that this works as expected
+        ArrayList<Move> newMoves = new ArrayList<>();
+        for(Move move: moves) {
+            if(!(move instanceof Move.MoveSimple)) { // TODO validate that this works as expected
+                newMoves.add(move);
                 continue;
-            Move.MoveSimple move = (Move.MoveSimple)moves.get(i);
-            if(Rules.isPromotion(board.getPiece(move.posFrom), move.posTo))
-                for(PieceType t: PieceType.values())
-                    moves.add(new Move.MovePawnPromotion(move.posFrom, move.posTo, t));
+            }
+            Move.MoveSimple moveS = (Move.MoveSimple)move;
+            if(Rules.isPromotion(board.getPiece(moveS.posFrom), moveS.posTo))
+                for(PieceType t: Rules.PAWN_PROMOTION_OPTIONS)
+                    newMoves.add(new Move.MovePawnPromotion(moveS.posFrom, moveS.posTo, t));
+            else
+                newMoves.add(move);
         }
+        moves = newMoves;
 
         if(enpassant != null) {
             ArrayList<Position> involved = Rules.getEnpassantInvolvedPositions(enpassant);
             Piece attacked = board.getPiece(involved.get(0));
             if(!Piece.isEmpty(attacked)) {
-                for(int i=1; i<involved.size(); ++i) {
+                for(int i=2; i<involved.size(); ++i) {
                     Piece attacking = board.getPiece(involved.get(i));
-                    if(!Piece.isEmpty(attacking) && attacking.color != attacked.color)
+                    if(!Piece.isEmpty(attacking) && attacking.type == PieceType.PAWN && attacking.color != attacked.color)
                         moves.add(new Move.MoveEnpassant(attacking.pos, enpassant));
                 }
             }
@@ -142,11 +144,20 @@ public class ArrayBoardPosition implements BoardPosition {
 
         moves.addAll(getCastlingMoves());
 
-        ArrayList<BoardPosition> nextMoves = new ArrayList<>();
-        for(Move move: moves) {
+        return moves;
+    }
+
+    @Override
+    public List<BoardPosition> getNextPositions() {
+        if(nextMoves != null)
+            return nextMoves;
+
+        nextMoves = new ArrayList<>();
+        for(Move move: getMoves()) {
             ArrayBoardPosition newBP = move.apply(this);
-            if(!newBP.isKingValid() || newBP.isCheck(turnColor))
+            if(newBP == null || !newBP.isKingValid() || newBP.isCheck(turnColor))
                 continue;
+//            System.out.println(move);
             nextMoves.add(newBP);
         }
 
