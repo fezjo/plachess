@@ -10,7 +10,7 @@ public interface Move {
      * can be null if the move is invalid (not all checks are performed)
      * use MoveEnpassant if performing en passant!
      */
-    ArrayBoardPosition apply(ArrayBoardPosition bp);
+    Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp);
 
     /** set false to specified positions in castling (if side is null, set both sides) */
     static void loseCastling(boolean[] castling, Color color, PieceType side) {
@@ -57,6 +57,8 @@ public interface Move {
                 posTo.y == Rules.getColorHomeRow(piece.color.opposite());
     }
 
+
+
     class MoveSimple implements Move {
         public final Position posFrom, posTo;
 
@@ -65,7 +67,7 @@ public interface Move {
             this.posTo = posTo;
         }
 
-        public ArrayBoardPosition apply(ArrayBoardPosition bp) {
+        public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
             // valid positions
             if(!posFrom.isValid() || !posTo.isValid())
                 return null;
@@ -81,7 +83,6 @@ public interface Move {
 
             boolean[] newCastling = Move.updateCastling(bp.getCastling(), pieceFrom);
             Position newEnpassant = Move.updateEnpassant(pieceFrom, posTo);
-
             Color newTurnColor = bp.getTurnColor().opposite();
 
             int clockChange = newTurnColor != Rules.FIRST_TURN ? 1 : 0;
@@ -94,11 +95,12 @@ public interface Move {
                     new Pair<>(posTo, pieceFrom)
             ));
 
-            return new ArrayBoardPosition(
+            return new Pair<>(
+                new ArrayBoardPosition(
                     newBoard, newTurnColor,
                     newCastling, newEnpassant,
-                    newHalfMoveClock, newFullMoveClock
-            );
+                    newHalfMoveClock, newFullMoveClock),
+                capturing);
         }
 
         @Override
@@ -135,7 +137,7 @@ public interface Move {
         }
 
         @Override
-        public ArrayBoardPosition apply(ArrayBoardPosition bp) {
+        public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
             // valid positions
             if(!Rules.isValidCastlingSide(side) || !bp.canCastle(color, side))
                 return null;
@@ -161,11 +163,12 @@ public interface Move {
                         new Pair<>(posKing.add(dirKing, 0), oldBoard.getPiece(posRook))
             ));
 
-            return new ArrayBoardPosition(
-                    newBoard, newTurnColor,
-                    newCastling, null,
-                    newHalfMoveClock, newFullMoveClock
-            );
+            return new Pair<>(
+                    new ArrayBoardPosition(
+                            newBoard, newTurnColor,
+                            newCastling, null,
+                            newHalfMoveClock, newFullMoveClock),
+                    false);
         }
 
         @Override
@@ -203,7 +206,7 @@ public interface Move {
         }
 
         @Override
-        public ArrayBoardPosition apply(ArrayBoardPosition bp) {
+        public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
             // valid positions
             if(!posFrom.isValid() || !posTo.isValid())
                 return null;
@@ -232,11 +235,12 @@ public interface Move {
                     new Pair<>(posTo, new Piece(null, pieceFrom.color, promotion))
             ));
 
-            return new ArrayBoardPosition(
-                    newBoard, newTurnColor,
-                    bp.getCastling(), null,
-                    newHalfMoveClock, newFullMoveClock
-            );
+            return new Pair<>(
+                    new ArrayBoardPosition(
+                            newBoard, newTurnColor,
+                            bp.getCastling(), null,
+                            newHalfMoveClock, newFullMoveClock),
+                    capturing);
         }
 
         @Override
@@ -273,7 +277,7 @@ public interface Move {
         }
 
         @Override
-        public ArrayBoardPosition apply(ArrayBoardPosition bp) {
+        public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
             // valid positions
             if(!posFrom.isValid() || !posTo.isValid())
                 return null;
@@ -309,11 +313,12 @@ public interface Move {
                     new Pair<>(posTo, pieceFrom)
             ));
 
-            return new ArrayBoardPosition(
-                    newBoard, newTurnColor,
-                    bp.getCastling(), null,
-                    newHalfMoveClock, newFullMoveClock
-            );
+            return new Pair<>(
+                    new ArrayBoardPosition(
+                            newBoard, newTurnColor,
+                            bp.getCastling(), null,
+                            newHalfMoveClock, newFullMoveClock),
+                    true);
         }
 
         @Override

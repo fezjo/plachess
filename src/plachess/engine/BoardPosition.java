@@ -42,6 +42,9 @@ public interface BoardPosition {
      */
     List<BoardPosition> getNextPositions();
 
+    /** same as getNextPositions but updates Stats class for debugging purposes */
+    List<BoardPosition> getNextPositions(Perft.Stats stats);
+
     /**
      * either side has exactly one, kings do not threaten each other
      * @return whether rules about kings are met

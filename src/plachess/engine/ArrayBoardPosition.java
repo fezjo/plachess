@@ -55,7 +55,7 @@ public class ArrayBoardPosition implements BoardPosition {
     }
 
     public ArrayBoardPosition getAfterMove(Move move) {
-        return move.apply(this);
+        return move.apply(this).frst;
     }
 
     @Override
@@ -154,9 +154,31 @@ public class ArrayBoardPosition implements BoardPosition {
 
         nextMoves = new ArrayList<>();
         for(Move move: getMoves()) {
-            ArrayBoardPosition newBP = move.apply(this);
+            ArrayBoardPosition newBP = move.apply(this).frst;
             if(newBP == null || !newBP.isKingValid() || newBP.isCheck(turnColor))
                 continue;
+//            System.out.println(move);
+            nextMoves.add(newBP);
+        }
+
+        return nextMoves;
+    }
+
+    public List<BoardPosition> getNextPositions(Perft.Stats stats) {
+        if(stats == null) return getNextPositions();
+
+        nextMoves = new ArrayList<>();
+        for(Move move: getMoves()) {
+            Pair<ArrayBoardPosition, Boolean> moveRes = move.apply(this);
+            ArrayBoardPosition newBP = moveRes.frst;
+            if(newBP == null || !newBP.isKingValid() || newBP.isCheck(turnColor))
+                continue;
+
+            if(moveRes.scnd) stats.captures++;
+            if(move instanceof Move.MoveCastling) stats.castles++;
+            if(move instanceof Move.MoveEnpassant) stats.enpassants++;
+            if(move instanceof Move.MovePawnPromotion) stats.promotions++;
+
 //            System.out.println(move);
             nextMoves.add(newBP);
         }
