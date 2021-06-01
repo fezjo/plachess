@@ -6,7 +6,31 @@ public class BitBoardLayer {
     public static final int BS = 8;
     public static final int BM = 0xFF;
 
+    public static class BitBoardLayerBuilder extends BitBoardLayer {
+        public long b;
+        public BitBoardLayerBuilder() { this.b = 0; }
+        public BitBoardLayerBuilder(long value) { this.b = value; }
+        public BitBoardLayerBuilder(BitBoardLayer bbl) { this.b = bbl.b; }
+        public BitBoardLayer setCell(int x, int y, int val) {
+            int shift = y * BS + x;
+            this.b = this.b & ~(1L << shift) | ((long) val << shift);
+            return this;
+        }
+        public BitBoardLayer build() {
+            return new BitBoardLayer(this.b);
+        }
+        public static BitBoardLayer build(BitBoardLayer bbl) {
+            if(bbl instanceof BitBoardLayerBuilder)
+                return ((BitBoardLayerBuilder)bbl).build();
+            return bbl;
+        }
+    }
+
     public final long b;
+
+    public BitBoardLayer() {
+        this.b = 0;
+    }
 
     public BitBoardLayer(long value) {
         this.b = value;
@@ -44,6 +68,11 @@ public class BitBoardLayer {
 
     public byte getCell(int x, int y) {
         return (byte)((getRow(y) & (1 << x)) == 0 ? 0 : 1);
+    }
+
+    public BitBoardLayer setCell(int x, int y, int val) {
+        int shift = y * BS + x;
+        return new BitBoardLayer(this.b & ~(1L << shift) | ((long) val << shift));
     }
 
     /*
@@ -85,6 +114,7 @@ public class BitBoardLayer {
         int i = ((x - y) + 16) & 15;
         return (byte)((board.b & ROTATE45_MASK[i]) >>> ROTATE45_SHIFT[i]);
     }
+
     public static byte getDiagonalFromRotated45_2(BitBoardLayer board, int x, int y) {
         int i = ((x - y) + 16) & 15;
         int last3 = i & 7;

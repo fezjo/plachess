@@ -22,17 +22,6 @@ public abstract class ArrayBoard implements Board {
         return result;
     }
 
-    @Override
-    public ArrayList<Move.MoveSimple> getAllSimpleMoves(Color color) {
-        ArrayList<Move.MoveSimple> result = new ArrayList<>();
-        for(Piece piece: getAllPieces()) {
-            if(piece.color != color)
-                continue;
-            result.addAll(getSimpleMoves(piece.pos));
-        }
-        return result;
-    }
-
     /** ignores enpassant */
     @Override
     public ArrayList<Position> getThreatening(Piece piece) {
