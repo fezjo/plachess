@@ -62,18 +62,18 @@ public class ArrayBoardImplementation {
     }
 
     /**
-     * @param mask 1=travel 2=capture
+     * @param retMask 1=travel 2=capture
      * @return all reachable positions on board with regard to other pieces
      */
-    public static ArrayList<Position> getMoves(Board board, Piece piece, int mask) {
-        if (piece.type == PieceType.EMPTY)
+    public static ArrayList<Position> getMoves(Board board, Piece piece, int retMask) {
+        if (Piece.isEmpty(piece))
             return new ArrayList<Position>();
         if(piece.type == PieceType.PAWN)
-            return getMovesPawn(board, piece, mask);
+            return getMovesPawn(board, piece, retMask);
         List<Position> move_directions = MOVE_DIRECTIONS.get(piece.type);
         int move_range = MOVE_RANGE.get(piece.type);
-        boolean retTravel=(mask&1)!=0,
-                retCapture=(mask&2)!=0;
+        boolean retTravel = (retMask & 1) != 0,
+                retCapture = (retMask & 2) != 0;
 
         ArrayList<Position> result = new ArrayList<>();
         for(Position direction: move_directions) {
@@ -92,28 +92,29 @@ public class ArrayBoardImplementation {
     }
 
     /**
-     * @param mask 1=travel 2=capture  */
-    public static ArrayList<Position> getMovesPawn(Board board, Piece piece, int mask) {
-        boolean retTravel=(mask&1)!=0,
-                retCapture=(mask&2)!=0;
-        ArrayList<Position> result = new ArrayList<>();
-        Position direction = Position.getNew(0, Rules.getColorDirection(piece.color));
+     * @param retMask 1=travel 2=capture  */
+    public static ArrayList<Position> getMovesPawn(Board board, Piece piece, int retMask) {
+        boolean retTravel = (retMask & 1) != 0,
+                retCapture = (retMask & 2) != 0;
+        int dirY = Rules.getColorDirection(piece.color);
         boolean hasMoved = Rules.isPawnMoved(piece.pos, piece.color);
 
-        Position next = piece.pos.add(direction);
+        ArrayList<Position> result = new ArrayList<>();
+        Position next;
         if(retTravel) {
+            next = piece.pos.add(0, dirY);
             boolean blocked = board.isOccupied(next);
             if (Rules.isPositionValid(next) && !blocked)
                 result.add(next);
             if (!hasMoved && !blocked) {
-                next = next.add(direction);
+                next = next.add(0, dirY);
                 if (Rules.isPositionValid(next) && !board.isOccupied(next))
                     result.add(next);
             }
         }
         if(retCapture) {
-            for (int x = -1; x < 2; x += 2) {
-                next = piece.pos.add(Position.getNew(x, direction.y));
+            for (int x = -1; x <= 1; x += 2) {
+                next = piece.pos.add(x, dirY);
                 if (Rules.isPositionValid(next) && board.isOccupied(next) && board.getPiece(next).color != piece.color)
                     result.add(next);
             }

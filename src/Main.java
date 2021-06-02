@@ -8,12 +8,24 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        if(false) {
-            Perft.test();
+        Stopwatch sw = new Stopwatch();
+
+        if(true) {
+            sw.message = "Perft testing BitBoard -> %dms\n";
+            sw.start();
+            Perft.test(new BitBoard());
+            sw.finish(true);
+
+            if(false) {
+                sw.message = "Perft testing Array1DBoard -> %dms\n";
+                sw.start();
+                Perft.test(new Array1DBoard());
+                sw.finish(true);
+            }
             return;
         }
 
-        if(true) {
+        if(false) {
             BitBoardImplementation.getMoves(null, null, 0);
             BitBoardLayerTest.test();
             return;
@@ -31,7 +43,10 @@ public class Main {
 //        Scanner scanner = new Scanner(System.in);
 //        String xfen = scanner.nextLine();
 
-        long start = System.currentTimeMillis();
+
+
+        sw.message = "Testing from xfen -> %dms\n";
+        sw.start();
 
         Solver solver = SolverFactory.makeSolverFromXFEN(xfen);
         solver.solve();
@@ -45,9 +60,6 @@ public class Main {
         }
         System.out.println(ArrayBoardPosition.spawnCount);
 
-
-        long finish = System.currentTimeMillis();
-        long timeElapsed = finish - start;
-        System.out.println("Time " + timeElapsed + "ms");
+        sw.finish(true);
     }
 }

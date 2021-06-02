@@ -16,7 +16,7 @@ public class BitBoardLayerTest {
             BitBoardLayer rbbl = bbl.rotate90();
             for(int y = 0; y < BitBoardLayer.BS; ++y) {
                 for(int x = 0; x < BitBoardLayer.BS; ++x) {
-                    if(bbl.getCell(x, y) != rbbl.getCell(y, BitBoardLayer.BS-1 - x)) {
+                    if(bbl.isCell(x, y) != rbbl.isCell(y, BitBoardLayer.BS-1 - x)) {
                         System.out.printf("WA:\n%s\n%s", bbl, rbbl);
                         return;
                     }

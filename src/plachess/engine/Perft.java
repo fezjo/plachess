@@ -43,7 +43,7 @@ public class Perft {
         }
     }
 
-    public static boolean test() {
+    public static boolean test(Board emptyBoard) {
         ArrayList<Pair<String, ArrayList<Integer>>> tests = new ArrayList<>(Arrays.asList(
                 new Pair<>(
                         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -81,10 +81,11 @@ public class Perft {
             ArrayList<Integer> nodes = test.scnd;
             for(int depth=0; depth < nodes.size(); ++depth) {
                 int wantedResult = nodes.get(depth);
-//                if(wantedResult > 1e7) continue; // TODO remove
+                if(wantedResult > 1e5) continue; // TODO remove
                 System.out.printf("Testing %s in depth %d - should be %d\n", xfen, depth, wantedResult);
                 Stats stats = new Stats();
-                recurse(BoardPosition.fromXFEN(xfen, new Array1DBoard()), depth, stats);
+                BoardPosition bp = BoardPosition.fromXFEN(xfen, emptyBoard);
+                recurse(bp, depth, stats);
 //                System.out.printf("Wrong number of nodes in test\n%s\nin depth %d should be %d but was %d\nStats: %s\n",
 //                        xfen, depth, wantedResult, stats.nodes, stats);
                 if(stats.nodes != wantedResult) {

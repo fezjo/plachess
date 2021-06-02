@@ -1,5 +1,6 @@
 package plachess.engine;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class BitBoardLayer {
@@ -7,12 +8,14 @@ public class BitBoardLayer {
     public static final int BA = BS*BS; // Board Area
     public static final int BM = 0xFF;  // Byte Mask
 
+    public static final BitBoardLayer EMPTY = new BitBoardLayer(0L);
+    public static final BitBoardLayer FULL = new BitBoardLayer(-1L);
+
     public static int posToIndex(int x, int y) {
         return y * BS + x;
     }
 
     public static class BitBoardLayerBuilder extends BitBoardLayer {
-        public long b;
         public BitBoardLayerBuilder() { this.b = 0; }
         public BitBoardLayerBuilder(long value) { this.b = value; }
         public BitBoardLayerBuilder(BitBoardLayer bbl) { this.b = bbl.b; }
@@ -32,9 +35,13 @@ public class BitBoardLayer {
         }
     }
 
-    public final long b;
+    protected long b;
 
-    public BitBoardLayer() {
+    public long get() {
+        return this.b;
+    }
+
+    private BitBoardLayer() {
         this.b = 0;
     }
 
@@ -72,8 +79,12 @@ public class BitBoardLayer {
         return (byte)((b >> (y * BS)) & BM);
     }
 
-    public byte getCell(int x, int y) {
-        return (byte)((getRow(y) & (1 << x)) == 0 ? 0 : 1);
+    public boolean isCell(int x, int y) {
+        return (getRow(y) & (1 << x)) != 0;
+    }
+
+    public int getCell(int x, int y) {
+        return isCell(x, y) ? 0 : 1;
     }
 
     public BitBoardLayer setCell(int x, int y, int val) {
@@ -211,9 +222,9 @@ public class BitBoardLayer {
     public BitBoardLayer rotate(int angle) {
         if(angle < 6) {
             BitBoardLayer result = this;
-            if ((angle & 4) != 0) result = this.rotate180();
-            if ((angle & 2) != 0) result = this.rotate90();
-            if ((angle & 1) != 0) result = this.rotate45();
+            if ((angle & 4) != 0) result = result.rotate180();
+            if ((angle & 2) != 0) result = result.rotate90();
+            if ((angle & 1) != 0) result = result.rotate45();
             return result;
         } else if(angle == 6) return this.rotate90A();
         else if(angle == 7) return this.rotate45A();
@@ -258,4 +269,32 @@ public class BitBoardLayer {
         x ^=       t ^ (t >>  9) ;
         return new BitBoardLayer(x);
     }
+
+    public ArrayList<Position> getAllOnes() { // TODO test by getting rows / binary search / LSB
+        ArrayList<Position> result = new ArrayList<>();
+        int count = Long.bitCount(this.b);
+        if(count > 10) {
+            for (int y = 0; y < BitBoardLayer.BS; ++y) {
+                byte row = getRow(y);
+                for (int x = 0; x < BitBoardLayer.BS; ++x) {
+                    if ((row & (1 << x)) != 0)
+                        result.add(Position.getNew(x, y));
+                }
+            }
+        } else {
+            long x = this.b;
+            while(count > 0) {
+                int i = Long.numberOfTrailingZeros(x);
+                x ^= 1L << i;
+                result.add(Position.getNew(i % BS, i / BS));
+                --count;
+            }
+        }
+        return result;
+    }
+
+    public BitBoardLayer not() { return new BitBoardLayer(~this.b); }
+    public BitBoardLayer and(BitBoardLayer that) { return new BitBoardLayer(this.b & that.b); }
+    public BitBoardLayer or(BitBoardLayer that) { return new BitBoardLayer(this.b | that.b); }
+    public BitBoardLayer xor(BitBoardLayer that) { return new BitBoardLayer(this.b ^ that.b); }
 }
