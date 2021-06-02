@@ -38,7 +38,7 @@ public class Array2DBoard extends ArrayBoard {
     }
 
     @Override
-    public List<Piece> getAllPieces() {
+    public ArrayList<Piece> getAllPieces() {
         ArrayList<Piece> result = new ArrayList<>();
         for(int y=0; y<grid.length; ++y)
             for(int x=0; x<grid[y].length; ++x)

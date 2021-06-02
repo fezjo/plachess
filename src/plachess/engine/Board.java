@@ -23,10 +23,10 @@ public interface Board {
     List<Piece> getAllPieces();
 
     /** @return all possible simple moves (travel, capture) by piece on given position */
-    ArrayList<Move.MoveSimple> getSimpleMoves(Position pos);
+    List<Move.MoveSimple> getSimpleMoves(Position pos);
 
     /** @return all possible simple moves (travel, capture) by all pieces of given color */
-    default ArrayList<Move.MoveSimple> getAllSimpleMoves(Color color) {
+    default List<Move.MoveSimple> getAllSimpleMoves(Color color) {
         ArrayList<Move.MoveSimple> result = new ArrayList<>();
         for(Piece piece: getAllPieces()) {
             if(piece.color != color)
@@ -37,7 +37,7 @@ public interface Board {
     }
 
     /** @return all pieces threatening given piece */
-    ArrayList<Position> getThreatening(Piece piece);
+    List<Position> getThreatening(Piece piece);
 
     /** @return whether given piece is threatened */
     boolean isThreatened(Piece piece);

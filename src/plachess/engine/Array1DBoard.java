@@ -40,7 +40,7 @@ public class Array1DBoard extends ArrayBoard {
     }
 
     @Override
-    public List<Piece> getAllPieces() {
+    public ArrayList<Piece> getAllPieces() {
         ArrayList<Piece> result = new ArrayList<>();
         for(int i=0; i<grid.length; ++i)
             if(isOccupied(i))

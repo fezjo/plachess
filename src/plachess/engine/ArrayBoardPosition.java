@@ -117,7 +117,7 @@ public class ArrayBoardPosition implements BoardPosition {
         return result;
     }
 
-    private List<Move> getMoves() {
+    private ArrayList<Move> getMoves() {
         ArrayList<Move> moves = new ArrayList<>(board.getAllSimpleMoves(getTurnColor()));
         ArrayList<Move> newMoves = new ArrayList<>();
         for(Move move: moves) {
@@ -152,7 +152,7 @@ public class ArrayBoardPosition implements BoardPosition {
     }
 
     @Override
-    public List<BoardPosition> getNextPositions() {
+    public ArrayList<BoardPosition> getNextPositions() {
         if(nextMoves != null)
             return nextMoves;
 
@@ -168,7 +168,7 @@ public class ArrayBoardPosition implements BoardPosition {
         return nextMoves;
     }
 
-    public List<BoardPosition> getNextPositions(Perft.Stats stats) {
+    public ArrayList<BoardPosition> getNextPositions(Perft.Stats stats) {
         if(stats == null) return getNextPositions();
 
         nextMoves = new ArrayList<>();

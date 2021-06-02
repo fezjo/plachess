@@ -33,7 +33,7 @@ public class SparseBoard extends ArrayBoard {
     }
 
     @Override
-    public List<Piece> getAllPieces() {
+    public ArrayList<Piece> getAllPieces() {
         return new ArrayList<>(pieces.values());
     }
 

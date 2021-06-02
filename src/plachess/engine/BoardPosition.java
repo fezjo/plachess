@@ -100,7 +100,7 @@ public interface BoardPosition {
      * @param next all valid moves from curr
      * @return whether the color has been checkmated provided that next is list of all possible moves from it
      */
-    public static boolean isCheckMate(BoardPosition curr, List<BoardPosition> next, Color color) {
+    static boolean isCheckMate(BoardPosition curr, List<BoardPosition> next, Color color) {
         return curr.isCheck(color) && allMovesCheck(next, color);
     }
 
@@ -108,11 +108,11 @@ public interface BoardPosition {
      * @param next list of moves
      * @return whether exists move in which color will not be in check
      */
-    public static boolean allMovesCheck(List<BoardPosition> next, Color color) {
+    static boolean allMovesCheck(List<BoardPosition> next, Color color) {
         return next.stream().allMatch(x -> x.isCheck(color));
     }
 
-    public static BoardPosition fromXFEN(String xfen, Board board){
+    static BoardPosition fromXFEN(String xfen, Board board){
         String[] field = xfen.split(" ");
 
         board = Board.fromXFEN(board, field[0]);

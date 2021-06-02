@@ -57,7 +57,7 @@ public class ArrayBoardImplementation {
     /**
      * @return all reachable positions on board as if it was empty
      */
-    public static List<Position> getUnobstructedMoves(Piece piece) {
+    public static ArrayList<Position> getUnobstructedMoves(Piece piece) {
         return getMoves(new EmptyBoard(), piece, 1);
     }
 
@@ -65,7 +65,7 @@ public class ArrayBoardImplementation {
      * @param mask 1=travel 2=capture
      * @return all reachable positions on board with regard to other pieces
      */
-    public static List<Position> getMoves(Board board, Piece piece, int mask) {
+    public static ArrayList<Position> getMoves(Board board, Piece piece, int mask) {
         if (piece.type == PieceType.EMPTY)
             return new ArrayList<Position>();
         if(piece.type == PieceType.PAWN)
@@ -93,7 +93,7 @@ public class ArrayBoardImplementation {
 
     /**
      * @param mask 1=travel 2=capture  */
-    public static List<Position> getMovesPawn(Board board, Piece piece, int mask) {
+    public static ArrayList<Position> getMovesPawn(Board board, Piece piece, int mask) {
         boolean retTravel=(mask&1)!=0,
                 retCapture=(mask&2)!=0;
         ArrayList<Position> result = new ArrayList<>();
