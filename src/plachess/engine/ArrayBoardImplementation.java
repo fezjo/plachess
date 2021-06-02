@@ -1,13 +1,12 @@
 package plachess.engine;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 public class ArrayBoardImplementation {
-    private final Map<PieceType, List<Position>> MOVE_DIRECTIONS;
-    private final Map<PieceType, Integer> MOVE_RANGE;
+    private static final Map<PieceType, List<Position>> MOVE_DIRECTIONS;
+    private static final Map<PieceType, Integer> MOVE_RANGE;
 
-    public ArrayBoardImplementation() {
+    static {
         MOVE_DIRECTIONS = new EnumMap<>(PieceType.class);
         MOVE_RANGE = new EnumMap<>(PieceType.class);
 
@@ -53,22 +52,24 @@ public class ArrayBoardImplementation {
         MOVE_RANGE.put(PieceType.KING, 1);
     }
 
+    public ArrayBoardImplementation() {}
+
     /**
      * @return all reachable positions on board as if it was empty
      */
-    public List<Position> getUnobstructedMoves(Piece piece) {
-        return getMoves(piece, new EmptyBoard(), 1);
+    public static List<Position> getUnobstructedMoves(Piece piece) {
+        return getMoves(new EmptyBoard(), piece, 1);
     }
 
     /**
      * @param mask 1=travel 2=capture
      * @return all reachable positions on board with regard to other pieces
      */
-    public List<Position> getMoves(Piece piece, Board board, int mask) {
+    public static List<Position> getMoves(Board board, Piece piece, int mask) {
         if (piece.type == PieceType.EMPTY)
             return new ArrayList<Position>();
         if(piece.type == PieceType.PAWN)
-            return getMovesPawn(piece, board, mask);
+            return getMovesPawn(board, piece, mask);
         List<Position> move_directions = MOVE_DIRECTIONS.get(piece.type);
         int move_range = MOVE_RANGE.get(piece.type);
         boolean retTravel=(mask&1)!=0,
@@ -78,7 +79,7 @@ public class ArrayBoardImplementation {
         for(Position direction: move_directions) {
             Position pos = piece.pos.add(direction);
             for(int dist=1; dist <= move_range; ++dist, pos=pos.add(direction)) {
-                if(!pos.isValid()) break;
+                if(!Rules.isPositionValid(pos)) break;
                 if(board.isOccupied(pos)) {
                     if(board.getPiece(pos).color != piece.color)
                         if(retCapture) result.add(pos);
@@ -90,30 +91,30 @@ public class ArrayBoardImplementation {
         return result;
     }
 
-    /** @param mask 1=travel 2=capture */
-    public List<Position> getMovesPawn(Piece piece, Board board, int mask) {
+    /**
+     * @param mask 1=travel 2=capture  */
+    public static List<Position> getMovesPawn(Board board, Piece piece, int mask) {
         boolean retTravel=(mask&1)!=0,
                 retCapture=(mask&2)!=0;
         ArrayList<Position> result = new ArrayList<>();
-        int homeRow = Rules.getColorHomeRow(piece.color);
         Position direction = Position.getNew(0, Rules.getColorDirection(piece.color));
         boolean hasMoved = Rules.isPawnMoved(piece.pos, piece.color);
 
         Position next = piece.pos.add(direction);
         if(retTravel) {
             boolean blocked = board.isOccupied(next);
-            if (next.isValid() && !blocked)
+            if (Rules.isPositionValid(next) && !blocked)
                 result.add(next);
             if (!hasMoved && !blocked) {
                 next = next.add(direction);
-                if (next.isValid() && !board.isOccupied(next))
+                if (Rules.isPositionValid(next) && !board.isOccupied(next))
                     result.add(next);
             }
         }
         if(retCapture) {
             for (int x = -1; x < 2; x += 2) {
                 next = piece.pos.add(Position.getNew(x, direction.y));
-                if (next.isValid() && board.isOccupied(next) && board.getPiece(next).color != piece.color)
+                if (Rules.isPositionValid(next) && board.isOccupied(next) && board.getPiece(next).color != piece.color)
                     result.add(next);
             }
         }

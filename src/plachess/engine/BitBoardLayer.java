@@ -3,16 +3,22 @@ package plachess.engine;
 import java.util.Random;
 
 public class BitBoardLayer {
-    public static final int BS = 8;
-    public static final int BM = 0xFF;
+    public static final int BS = 8;     // Board Size
+    public static final int BA = BS*BS; // Board Area
+    public static final int BM = 0xFF;  // Byte Mask
+
+    public static int posToIndex(int x, int y) {
+        return y * BS + x;
+    }
 
     public static class BitBoardLayerBuilder extends BitBoardLayer {
         public long b;
         public BitBoardLayerBuilder() { this.b = 0; }
         public BitBoardLayerBuilder(long value) { this.b = value; }
         public BitBoardLayerBuilder(BitBoardLayer bbl) { this.b = bbl.b; }
+        public void clear() { this.b = 0; }
         public BitBoardLayer setCell(int x, int y, int val) {
-            int shift = y * BS + x;
+            int shift = posToIndex(x, y);
             this.b = this.b & ~(1L << shift) | ((long) val << shift);
             return this;
         }
@@ -71,7 +77,7 @@ public class BitBoardLayer {
     }
 
     public BitBoardLayer setCell(int x, int y, int val) {
-        int shift = y * BS + x;
+        int shift = posToIndex(x, y);
         return new BitBoardLayer(this.b & ~(1L << shift) | ((long) val << shift));
     }
 

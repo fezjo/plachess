@@ -18,6 +18,11 @@ public interface Rules {
     int DRAW_HALFMOVES_NOCLAIM = 75;
     Color FIRST_TURN = Color.WHITE;
 
+    static boolean isPositionValid(Position pos) {
+        return pos.x >= 0 && pos.x < Rules.BOARD_SIZE
+            && pos.y >= 0 && pos.y < Rules.BOARD_SIZE;
+    }
+
     static int getColorHomeRow(Color color) { return color == Color.WHITE ? ROW_WHITE : ROW_BLACK; }
     static int getColorDirection(Color color) { return color == Color.WHITE ? DIR_WHITE : DIR_BLACK; }
 
@@ -45,7 +50,7 @@ public interface Rules {
         result.add(enpassant); // where attacker will end up
         for(int x = -1; x < 2; x += 2) { // both possible attackers
             Position attacking = enpassant.add(x, dirY);
-            if (attacking.isValid())
+            if (isPositionValid(attacking))
                 result.add(attacking);
         }
         return result;

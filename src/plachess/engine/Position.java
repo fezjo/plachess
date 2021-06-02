@@ -32,7 +32,6 @@ public class Position {
     private Position(int x, int y) { this.x = x; this.y = y; }
     private Position(Position p) { x = p.x; y = p.y; }
 
-    public boolean isValid() { return x >= 0 && x < Rules.BOARD_SIZE && y >= 0 && y < Rules.BOARD_SIZE; }
     public Position add(Position that) { return Position.getNew(this.x+that.x, this.y+that.y); }
     public Position add(int x, int y) { return Position.getNew(this.x+x, this.y+y); }
     public Position sub(Position that) { return Position.getNew(this.x-that.x, this.y-that.y); }

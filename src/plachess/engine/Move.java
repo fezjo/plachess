@@ -71,7 +71,7 @@ public interface Move {
 
         public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
             // valid positions
-            if(!posFrom.isValid() || !posTo.isValid())
+            if(!Rules.isPositionValid(posFrom) || !Rules.isPositionValid(posTo))
                 return null;
             Board oldBoard = bp.getBoard();
 
@@ -210,7 +210,7 @@ public interface Move {
         @Override
         public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
             // valid positions
-            if(!posFrom.isValid() || !posTo.isValid())
+            if(!Rules.isPositionValid(posFrom) || !Rules.isPositionValid(posTo))
                 return null;
             Board oldBoard = bp.getBoard();
 
@@ -281,7 +281,7 @@ public interface Move {
         @Override
         public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
             // valid positions
-            if(!posFrom.isValid() || !posTo.isValid())
+            if(!Rules.isPositionValid(posFrom) || !Rules.isPositionValid(posTo))
                 return null;
             Board oldBoard = bp.getBoard();
             Position posAttacked = Position.getNew(posTo.x, posFrom.y);

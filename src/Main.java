@@ -14,6 +14,7 @@ public class Main {
         }
 
         if(true) {
+            BitBoardImplementation.getMoves(null, null, 0);
             BitBoardLayerTest.test();
             return;
         }

@@ -85,7 +85,7 @@ public class BitBoard implements Board { // TODO make variables final
     }
 
     @Override
-    public ArrayList<Piece> getAllPieces() {
+    public ArrayList<Piece> getAllPieces() { // TODO test by getting rows / binary search / LSB
         ArrayList<Piece> result = new ArrayList<>();
         for(int y = 0; y < BitBoardLayer.BS; ++y) {
             for (int x = 0; x < BitBoardLayer.BS; ++x) {
@@ -101,7 +101,7 @@ public class BitBoard implements Board { // TODO make variables final
             return null;
         ArrayList<Move.MoveSimple> result = new ArrayList<>();
         Piece piece = getPiece(pos);
-        for(Position nextPos: _getSimpleMoves(piece, 3))
+        for(Position nextPos: BitBoardImplementation.getMoves(this, piece, 3))
             result.add(new Move.MoveSimple(pos, nextPos));
         return result;
     }
@@ -112,7 +112,7 @@ public class BitBoard implements Board { // TODO make variables final
         for(PieceType type: PieceType.values()) {
             BitBoardLayer layer = pieceLayers.get(type);
             if(layer == null) continue;
-            for(Position pos: _getSimpleMoves(new Piece(piece.pos, piece.color, type), 2))
+            for(Position pos: BitBoardImplementation.getMoves(this, new Piece(piece.pos, piece.color, type), 2))
                 if(layer.getCell(pos.x, pos.y) != 0)
                     result.add(pos);
         }
@@ -124,7 +124,7 @@ public class BitBoard implements Board { // TODO make variables final
         for(PieceType type: PieceType.values()) {
             BitBoardLayer layer = pieceLayers.get(type);
             if(layer == null) continue;
-            for(Position pos: _getSimpleMoves(new Piece(piece.pos, piece.color, type), 2))
+            for(Position pos: BitBoardImplementation.getMoves(this, new Piece(piece.pos, piece.color, type), 2))
                 if(layer.getCell(pos.x, pos.y) != 0)
                     return true;
         }
@@ -154,9 +154,5 @@ public class BitBoard implements Board { // TODO make variables final
 
         }
         return bbb.build();
-    }
-
-    private ArrayList<Position> _getSimpleMoves(Piece piece, int mask) {
-        return null;
     }
 }
