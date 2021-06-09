@@ -54,12 +54,19 @@ public class ArrayBoardPosition implements BoardPosition {
         nextMoves = null;
     }
 
+    public ArrayBoardPosition create(
+            Board board, Color turnColor,
+            boolean[] castling, Position enpassant,
+            int halfMoveClock, int fullMoveClock) {
+        return new ArrayBoardPosition(board, turnColor, castling, enpassant, halfMoveClock, fullMoveClock);
+    }
+
     public void destroy() {
         nextMoves = null;
     }
 
     public ArrayBoardPosition getAfterMove(Move move) {
-        return move.apply(this).frst;
+        return (ArrayBoardPosition)move.apply(this).frst;
     }
 
     @Override
@@ -158,7 +165,7 @@ public class ArrayBoardPosition implements BoardPosition {
 
         nextMoves = new ArrayList<>();
         for(Move move: getMoves()) {
-            ArrayBoardPosition newBP = move.apply(this).frst;
+            BoardPosition newBP = move.apply(this).frst;
             if(newBP == null || !newBP.isKingValid() || newBP.isCheck(turnColor))
                 continue;
 //            System.out.println(move);
@@ -173,8 +180,8 @@ public class ArrayBoardPosition implements BoardPosition {
 
         nextMoves = new ArrayList<>();
         for(Move move: getMoves()) {
-            Pair<ArrayBoardPosition, Boolean> moveRes = move.apply(this);
-            ArrayBoardPosition newBP = moveRes.frst;
+            Pair<BoardPosition, Boolean> moveRes = move.apply(this);
+            BoardPosition newBP = moveRes.frst;
             if(newBP == null || !newBP.isKingValid() || newBP.isCheck(turnColor))
                 continue;
 

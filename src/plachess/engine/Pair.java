@@ -2,6 +2,7 @@ package plachess.engine;
 
 import java.util.Objects;
 
+/** generic class for storing pair of objects */
 public class Pair<T1, T2> {
     public T1 frst;
     public T2 scnd;

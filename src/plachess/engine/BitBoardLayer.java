@@ -3,6 +3,11 @@ package plachess.engine;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * @Immutable
+ * representation of 8x8 board in one 64-bit number
+ * with helper methods for getting, setting and transforming
+ */
 public class BitBoardLayer {
     public static final int BS = 8;     // Board Size
     public static final int BA = BS*BS; // Board Area
@@ -15,6 +20,10 @@ public class BitBoardLayer {
         return y * BS + x;
     }
 
+    /**
+     * class with the same functionality as BitBoardLayer,
+     * but mutable and therefore with support for batched changes
+     */
     public static class BitBoardLayerBuilder extends BitBoardLayer {
         public BitBoardLayerBuilder() { this.b = 0; }
         public BitBoardLayerBuilder(long value) { this.b = value; }
@@ -195,6 +204,7 @@ public class BitBoardLayer {
         return new BitBoardLayer(x);
     }
 
+    /** because rotate45 is pseudo operation, it has to be always done last, it is not commutative */
     public BitBoardLayer rotate45A() {
         final long k1 = 0x5555555555555555L;
         final long k2 = 0x3333333333333333L;
@@ -219,6 +229,7 @@ public class BitBoardLayer {
         return new BitBoardLayer(Long.reverse(this.b));
     }
 
+    /** rotate by angle * 45° */
     public BitBoardLayer rotate(int angle) {
         if(angle < 6) {
             BitBoardLayer result = this;
@@ -232,14 +243,17 @@ public class BitBoardLayer {
     }
 
 
+    /** reverse rows */
     public BitBoardLayer flipHorizontal() {
         return new BitBoardLayer(Long.reverseBytes(this.b));
     }
 
+    /** reverse columns */
     public BitBoardLayer flipVertical() {
         return flipHorizontal().rotate180();
     }
 
+    /** flip by lower-left to upper-right diagonal */
     public BitBoardLayer flipDiagonal() {
         final long k1 = 0x5500550055005500L;
         final long k2 = 0x3333000033330000L;
@@ -255,6 +269,7 @@ public class BitBoardLayer {
         return new BitBoardLayer(x);
     }
 
+    /** flip by upper-left to lower-right diagonal */
     public BitBoardLayer flipDiagonalA() {
         final long k1 = 0xaa00aa00aa00aa00L;
         final long k2 = 0xcccc0000cccc0000L;
@@ -270,6 +285,7 @@ public class BitBoardLayer {
         return new BitBoardLayer(x);
     }
 
+    /** @return all Positions for which board contains 1 bit */
     public ArrayList<Position> getAllOnes() { // TODO test by getting rows / binary search / LSB
         ArrayList<Position> result = new ArrayList<>();
         int count = Long.bitCount(this.b);

@@ -10,7 +10,9 @@ import java.util.List;
  * row and column numberings are from 0 to 7
  */
 public interface Board {
+    /** @return true if given position contains non-empty piece */
     default boolean isOccupied(Position pos) { return isOccupied(pos.x, pos.y); };
+    /** @return true if given position contains non-empty piece */
     default boolean isOccupied(int x, int y) { return isOccupied(Position.getNew(x, y)); }
 
     /**
@@ -20,28 +22,43 @@ public interface Board {
     default Piece getPiece(Position pos) { return getPiece(pos.x, pos.y); };
     default Piece getPiece(int x, int y) { return getPiece(Position.getNew(x, y)); }
 
+    /** @return List of all non-empty pieces on board */
     List<Piece> getAllPieces();
 
-    /** @return all possible simple moves (travel, capture) by piece on given position */
+    /**
+     * @return all possible simple moves (travel/capture) by piece on given position
+     *         or null if given position is empty
+     */
     List<Move.MoveSimple> getSimpleMoves(Position pos);
 
     /** @return all possible simple moves (travel, capture) by all pieces of given color */
     default List<Move.MoveSimple> getAllSimpleMoves(Color color) {
         ArrayList<Move.MoveSimple> result = new ArrayList<>();
         for(Piece piece: getAllPieces()) {
-            if(piece.color != color)
+            if(piece.color != color || !isOccupied(piece.pos))
                 continue;
             result.addAll(getSimpleMoves(piece.pos));
         }
         return result;
     }
 
-    /** @return all pieces threatening given piece */
+    /**
+     * find all positions from which given piece is threatened by simple moves (ignores enpassant)
+     * @return all pieces threatening given piece
+     */
     List<Position> getThreatening(Piece piece);
 
-    /** @return whether given piece is threatened */
+    /**
+     * (ignores enpassatn)
+     * @return whether given piece is threatened by any piece of opposite color
+     */
     boolean isThreatened(Piece piece);
 
+    /**
+     * create new board with some changes made (pieces moved/added/removed)
+     * @param work List of positions to be replaced by given piece
+     * @return new Board with all changes applied
+     */
     Board set(List<Pair<Position, Piece>> work);
 
 
@@ -64,7 +81,7 @@ public interface Board {
         return emptyBoard.set(instructions);
     }
 
-    /** @return the first part of XFEN */
+    /** @return board representation in XFEN (its first substring) */
     default String toXFEN() {
         StringBuilder sb = new StringBuilder();
         for(int y=Rules.BOARD_SIZE-1; y>=0; --y) {
@@ -88,6 +105,7 @@ public interface Board {
         return sb.toString();
     }
 
+    /** @return 2D String representation of board */
     default String toStringGrid() {
         StringBuilder sb = new StringBuilder();
         for(int y=Rules.BOARD_SIZE-1; y>=0; --y) {

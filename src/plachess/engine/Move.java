@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * interface for representing all types of moves
+ * uses Visitor pattern for modifying BoardPosition
+ */
 public interface Move {
     /**
      * @return BoardPosition after applying specified move
      * can be null if the move is invalid (not all checks are performed)
      * use MoveEnpassant if performing en passant!
      */
-    Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp);
+    Pair<BoardPosition, Boolean> apply(BoardPosition bp);
 
     /** set false to specified positions in castling (if side is null, set both sides) */
     static void loseCastling(boolean[] castling, Color color, PieceType side) {
@@ -69,7 +73,7 @@ public interface Move {
             this.posTo = posTo;
         }
 
-        public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
+        public Pair<BoardPosition, Boolean> apply(BoardPosition bp) {
             // valid positions
             if(!Rules.isPositionValid(posFrom) || !Rules.isPositionValid(posTo))
                 return null;
@@ -98,7 +102,7 @@ public interface Move {
             ));
 
             return new Pair<>(
-                new ArrayBoardPosition(
+                bp.create(
                     newBoard, newTurnColor,
                     newCastling, newEnpassant,
                     newHalfMoveClock, newFullMoveClock),
@@ -139,7 +143,7 @@ public interface Move {
         }
 
         @Override
-        public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
+        public Pair<BoardPosition, Boolean> apply(BoardPosition bp) {
             // valid positions
             if(!Rules.isValidCastlingSide(side) || !bp.canCastle(color, side))
                 return null;
@@ -166,7 +170,7 @@ public interface Move {
             ));
 
             return new Pair<>(
-                    new ArrayBoardPosition(
+                    bp.create(
                             newBoard, newTurnColor,
                             newCastling, null,
                             newHalfMoveClock, newFullMoveClock),
@@ -208,7 +212,7 @@ public interface Move {
         }
 
         @Override
-        public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
+        public Pair<BoardPosition, Boolean> apply(BoardPosition bp) {
             // valid positions
             if(!Rules.isPositionValid(posFrom) || !Rules.isPositionValid(posTo))
                 return null;
@@ -238,7 +242,7 @@ public interface Move {
             ));
 
             return new Pair<>(
-                    new ArrayBoardPosition(
+                    bp.create(
                             newBoard, newTurnColor,
                             bp.getCastling(), null,
                             newHalfMoveClock, newFullMoveClock),
@@ -279,7 +283,7 @@ public interface Move {
         }
 
         @Override
-        public Pair<ArrayBoardPosition, Boolean> apply(ArrayBoardPosition bp) {
+        public Pair<BoardPosition, Boolean> apply(BoardPosition bp) {
             // valid positions
             if(!Rules.isPositionValid(posFrom) || !Rules.isPositionValid(posTo))
                 return null;
@@ -316,7 +320,7 @@ public interface Move {
             ));
 
             return new Pair<>(
-                    new ArrayBoardPosition(
+                    bp.create(
                             newBoard, newTurnColor,
                             bp.getCastling(), null,
                             newHalfMoveClock, newFullMoveClock),

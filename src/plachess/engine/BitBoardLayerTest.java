@@ -2,6 +2,7 @@ package plachess.engine;
 
 import java.util.Random;
 
+/** testing of some BitBoardLayer functionality */
 public class BitBoardLayerTest {
     private static Random random = new Random();
 

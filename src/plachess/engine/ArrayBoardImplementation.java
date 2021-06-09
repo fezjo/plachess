@@ -3,7 +3,9 @@ package plachess.engine;
 import java.util.*;
 
 public class ArrayBoardImplementation {
+    /** List of one-step-vectors for each PieceType */
     private static final Map<PieceType, List<Position>> MOVE_DIRECTIONS;
+    /** how many of the same one-step-vector can be applied in one move */
     private static final Map<PieceType, Integer> MOVE_RANGE;
 
     static {
@@ -63,7 +65,7 @@ public class ArrayBoardImplementation {
 
     /**
      * @param retMask 1=travel 2=capture
-     * @return all reachable positions on board with regard to other pieces
+     * @return all reachable positions on board by simple moves with regard to other pieces
      */
     public static ArrayList<Position> getMoves(Board board, Piece piece, int retMask) {
         if (Piece.isEmpty(piece))
@@ -92,7 +94,9 @@ public class ArrayBoardImplementation {
     }
 
     /**
-     * @param retMask 1=travel 2=capture  */
+     * @param retMask 1=travel 2=capture
+     * @return all reachable positions on board by simple moves with regard to other pieces
+     */
     public static ArrayList<Position> getMovesPawn(Board board, Piece piece, int retMask) {
         boolean retTravel = (retMask & 1) != 0,
                 retCapture = (retMask & 2) != 0;

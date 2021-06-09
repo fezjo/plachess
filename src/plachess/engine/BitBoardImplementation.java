@@ -9,12 +9,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class BitBoardImplementation {
+    /** list of PieceTypes which can be handled by this implementation */
     public static final ArrayList<PieceType> supportedPieceTypes = new ArrayList<>(Arrays.asList(
             PieceType.PAWN, PieceType.KNIGHT, PieceType.BISHOP, PieceType.ROOK, PieceType.QUEEN, PieceType.KING
     ));
     private static final EnumMap<PieceType, BitBoardLayer[]> attackPatterns = new EnumMap<>(PieceType.class);
     private static final EnumMap<Color, BitBoardLayer[]> attackPatternsPawn = new EnumMap<>(Color.class);
     private static final EnumMap<Color, BitBoardLayer[]> movePatternsPawn = new EnumMap<>(Color.class);
+
+    /** angles by which the board should be rotated for all sliding PieceTypes */
     private static final EnumMap<PieceType, ArrayList<Integer>> attackAngles =
         new EnumMap<PieceType, ArrayList<Integer>>(Stream.of(
             new Pair<>(PieceType.BISHOP, new ArrayList<>(Arrays.asList(1, 3))),
@@ -22,6 +25,7 @@ public class BitBoardImplementation {
             new Pair<>(PieceType.QUEEN, new ArrayList<>(Arrays.asList(0, 2, 3, 1)))).
             collect(Collectors.toMap(p -> p.frst, p -> p.scnd))
     );
+    /** helper mapping from angle-key to vector */
     private static final Position[] angleDirection = {
             Position.getNew(1, 0),
             Position.getNew(1, 1),

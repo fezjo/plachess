@@ -5,6 +5,7 @@ import java.util.Objects;
 
 /**
  * @Immutable
+ * 2D integer vector
  */
 public class Position {
     private static final int MAX_CACHE = 16;

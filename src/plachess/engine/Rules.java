@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/** collections of constants and chess helper methods */
 public interface Rules {
     int BOARD_SIZE = 8;
     int ROW_WHITE = 0;

@@ -1,5 +1,6 @@
 package plachess.engine;
 
+/** class for measuring time intervals */
 public class Stopwatch {
     public String message;
     public long tStart, tFinish;

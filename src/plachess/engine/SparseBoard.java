@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implementation of ArrayBoard keeping only non-empty Pieces in some form of Position-keyed Map
+ */
 public class SparseBoard extends ArrayBoard {
     private Map<Position, Piece> pieces;
 

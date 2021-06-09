@@ -3,6 +3,7 @@ package plachess.engine;
 import java.util.ArrayList;
 import java.util.List;
 
+/** mocked Board class which is always empty */
 public class EmptyBoard implements Board {
     @Override
     public Board clone() { return this; }

@@ -3,7 +3,14 @@ package plachess.engine;
 import java.util.List;
 
 public interface BoardPosition {
+    /** cleanup method - HAS to be called eventually, otherwise GC is not guaranteed */
     void destroy();
+
+    /** constructor method */
+    BoardPosition create(
+            Board board, Color turnColor,
+            boolean[] castling, Position enpassant,
+            int halfMoveClock, int fullMoveClock);
 
     /** @return reference to board */
     Board getBoard();
@@ -25,6 +32,7 @@ public interface BoardPosition {
     Color getPieceColor(Position pos);
     default Color getPieceColor(int x, int y)  { return getPieceColor(Position.getNew(x, y)); }
 
+    /** @return true if given color can castle to given side */
     boolean canCastle(Color color, PieceType side);
 
     /**
@@ -48,13 +56,13 @@ public interface BoardPosition {
     List<BoardPosition> getNextPositions(Perft.Stats stats);
 
     /**
-     * either side has exactly one, kings do not threaten each other
+     * either side has exactly one king and they do not threaten each other
      * @return whether rules about kings are met
      */
     boolean isKingValid();
 
     /**
-     * K vs K, K vs K&knight, K vs K&bishop, K&bishop vs K&bishop on same color)
+     * (K vs K, K vs K&knight, K vs K&bishop, K&bishop vs K&bishop on same color)
      * @return whether the position is declared dead and therefore draw
      */
     boolean isDeadPosition();
@@ -75,7 +83,6 @@ public interface BoardPosition {
 
     /** @return whether the color is in check */
     boolean isCheck(Color color);
-
 
     /**
      * can be slow, use wisely
@@ -112,6 +119,10 @@ public interface BoardPosition {
         return next.stream().allMatch(x -> x.isCheck(color));
     }
 
+    /**
+     * @param board class of Board used inside BoardPosition (preferably empty)
+     * @return ArrayBoardPosition defined by given xfen
+     */
     static BoardPosition fromXFEN(String xfen, Board board){
         String[] field = xfen.split(" ");
 

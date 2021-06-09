@@ -3,6 +3,9 @@ package plachess.engine;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementation of ArrayBoard keeping Piece for every cell of board stored in 2D square array
+ */
 public class Array2DBoard extends ArrayBoard {
     private final Piece[][] grid;
 

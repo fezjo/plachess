@@ -3,6 +3,11 @@ package plachess.engine;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * correctness testing class
+ * checks number of reachable positions after some number of moves against official values
+ * source of positions and results: https://www.chessprogramming.org/Perft_Results
+ */
 public class Perft {
     public static class Stats {
         public int depth = 0;
@@ -81,7 +86,7 @@ public class Perft {
             ArrayList<Integer> nodes = test.scnd;
             for(int depth=0; depth < nodes.size(); ++depth) {
                 int wantedResult = nodes.get(depth);
-                if(wantedResult > 1e5) continue; // TODO remove
+                if(wantedResult > 1e7) continue; // TODO remove
                 System.out.printf("Testing %s in depth %d - should be %d\n", xfen, depth, wantedResult);
                 Stats stats = new Stats();
                 BoardPosition bp = BoardPosition.fromXFEN(xfen, emptyBoard);

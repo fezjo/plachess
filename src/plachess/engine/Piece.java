@@ -4,6 +4,7 @@ import java.util.Objects;
 
 /**
  * @Immutable
+ * container class for all information about chess piece
  */
 public class Piece {
     public final Color color;

@@ -2,6 +2,7 @@ import plachess.engine.*;
 import plachess.solver.Solver;
 import plachess.solver.SolverFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -16,7 +17,7 @@ public class Main {
             Perft.test(new BitBoard());
             sw.finish(true);
 
-            if(false) {
+            if(true) {
                 sw.message = "Perft testing Array1DBoard -> %dms\n";
                 sw.start();
                 Perft.test(new Array1DBoard());
